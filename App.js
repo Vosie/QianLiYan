@@ -6,6 +6,7 @@ import {
   View
 } from 'react-native';
 import { parseString } from 'react-native-xml2js';
+import TTS from 'react-native-tts';
 import _ from 'lodash';
 
 const FEED_LIST = ['https://feeds.feedburner.com/TheNewsLens'];
@@ -22,6 +23,13 @@ export default class App extends Component<{}> {
 
   componentDidMount() {
     this.fetchFeeds();
+    this.dumpTTSVoices();
+  }
+
+  dumpTTSVoices() {
+    TTS.voices().then((data) => {
+      console.log(data);
+    });
   }
 
   convertToFeedItem(url, rssItem) {
