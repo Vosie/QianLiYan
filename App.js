@@ -8,6 +8,7 @@ import {
 import { parseString } from 'react-native-xml2js';
 import TTS from 'react-native-tts';
 import _ from 'lodash';
+import MusicControl from 'react-native-music-control';
 
 const FEED_LIST = ['https://feeds.feedburner.com/TheNewsLens'];
 
@@ -24,6 +25,39 @@ export default class App extends Component<{}> {
   componentDidMount() {
     this.fetchFeeds();
     this.dumpTTSVoices();
+    this.initMusicControl();
+  }
+
+  initMusicControl() {
+    MusicControl.enableControl('play', true);
+    MusicControl.enableControl('pause', true);
+    MusicControl.enableControl('stop', false);
+    MusicControl.enableControl('nextTrack', true);
+    MusicControl.enableControl('previousTrack', true);
+    MusicControl.enableControl('seek', false) // Android only
+    MusicControl.enableControl('skipForward', true)
+    MusicControl.enableControl('skipBackward', true)
+    MusicControl.on('play', ()=> {
+      console.log('play');
+    })
+
+    // on iOS this event will also be triggered by the audio router change event.
+    // This happens when headphones are unplugged or a bluetooth audio peripheral disconnects from the device
+    MusicControl.on('pause', ()=> {
+      console.log('pause');
+    });
+
+    MusicControl.on('stop', ()=> {
+      console.log('stop');
+    });
+
+    MusicControl.on('nextTrack', ()=> {
+      console.log('nextTrack');
+    });
+
+    MusicControl.on('previousTrack', ()=> {
+      console.log('previousTrack');
+    });
   }
 
   dumpTTSVoices() {
@@ -54,7 +88,27 @@ export default class App extends Component<{}> {
       });
     });
 
-    this.setState({ items: newItems });
+    MusicControl.setNowPlaying({
+      title: newItems[0].title,
+      artist: 'TTS',
+      duration: 294, // (Seconds)
+      description: newItems[0].description
+    });
+
+    this.setState({ items: newItems }, () => {
+      MusicControl.setPlayback({
+        state: MusicControl.STATE_PLAYING,
+        speed: 1,
+        elapsedTime: 103,
+        bufferedTime: 200
+      })
+
+      MusicControl.enableControl('play', true)
+      MusicControl.enableControl('pause', true)
+      MusicControl.enableControl('stop', false)
+      MusicControl.enableControl('nextTrack', true)
+      MusicControl.enableControl('previousTrack', true)
+    });
   }
 
   fetchFeeds() {
