@@ -1,4 +1,6 @@
 rootProject.name = 'QianLiYan'
+include ':react-native-exit-app'
+project(':react-native-exit-app').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-exit-app/android')
 include ':react-native-music-control'
 project(':react-native-music-control').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-music-control/android')
 include ':react-native-tts'

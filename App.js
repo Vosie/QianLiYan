@@ -9,6 +9,7 @@ import { parseString } from 'react-native-xml2js';
 import TTS from 'react-native-tts';
 import _ from 'lodash';
 import MusicControl from 'react-native-music-control';
+import RNExitApp from 'react-native-exit-app';
 
 const FEED_LIST = ['https://feeds.feedburner.com/TheNewsLens'];
 
@@ -17,52 +18,144 @@ export default class App extends Component<{}> {
   constructor(props) {
     super(props);
     this.state = {
-      items: []
+      autoPlay: true,
+      currentIndex: -1,
+      items: [],
+      playingUtterance: null,
+      systemUtterance: null,
+      ttsState: MusicControl.STATE_STOPPED
     };
     this.renderListItem = this.renderListItem.bind(this);
+    this.handleTTSStarted = this.handleTTSStarted.bind(this);
+    this.handleTTSStopped = this.handleTTSStopped.bind(this);
   }
 
   componentDidMount() {
     this.fetchFeeds();
-    this.dumpTTSVoices();
+    this.initTTS();
     this.initMusicControl();
   }
 
+  componentWillUnmount() {
+
+  }
+
+  initTTS() {
+    TTS.addEventListener('tts-start', this.handleTTSStarted);
+    TTS.addEventListener('tts-cancel', this.handleTTSStopped);
+    TTS.addEventListener('tts-finish', this.handleTTSStopped);
+  }
+
   initMusicControl() {
+    // basic
     MusicControl.enableControl('play', true);
     MusicControl.enableControl('pause', true);
     MusicControl.enableControl('stop', false);
+    // previous and next
     MusicControl.enableControl('nextTrack', true);
     MusicControl.enableControl('previousTrack', true);
+    //
     MusicControl.enableControl('seek', false) // Android only
-    MusicControl.enableControl('skipForward', true)
-    MusicControl.enableControl('skipBackward', true)
+    MusicControl.enableControl('skipForward', false)
+    MusicControl.enableControl('skipBackward', false)
     MusicControl.on('play', ()=> {
       console.log('play');
+      TTS.stop();
     })
 
     // on iOS this event will also be triggered by the audio router change event.
     // This happens when headphones are unplugged or a bluetooth audio peripheral disconnects from the device
     MusicControl.on('pause', ()=> {
-      console.log('pause');
+      console.log('trying to stop it.');
+      TTS.stop();
     });
 
     MusicControl.on('stop', ()=> {
-      console.log('stop');
+      TTS.stop();
     });
 
     MusicControl.on('nextTrack', ()=> {
-      console.log('nextTrack');
+      TTS.stop();
     });
 
     MusicControl.on('previousTrack', ()=> {
-      console.log('previousTrack');
+      this.setState({
+        currentIndex: this.state.currentIndex - 1
+      }, () => {
+        TTS.stop();
+      });
+    });
+
+    MusicControl.on('closeNotification', () => {
+      this.setState({
+        autoPlay: false
+      }, () => {
+        TTS.stop();
+        RNExitApp.exitApp();
+      });
     });
   }
 
-  dumpTTSVoices() {
-    TTS.voices().then((data) => {
-      console.log(data);
+  handleTTSStarted(utteranceId) {
+    const { currentIndex, items } = this.state;
+    if (currentIndex < 0 || currentIndex >= items.length) {
+      // if no playing item found, it is playing system voice.
+      return;
+    }
+
+    const playingItem = items[currentIndex];
+
+    MusicControl.setNowPlaying({
+      title: playingItem.title,
+      artist: 'TTS',
+      duration: 1 + (playingItem.title.length + playingItem.description.length) / 7, // (Seconds)
+      description: playingItem.description,
+      ttsState: MusicControl.STATE_PLAYING,
+      speed: 1
+    });
+    console.log('playing size: ' + (playingItem.title.length + playingItem.description.length));
+  }
+
+  handleTTSStopped({ utteranceId }) {
+    const {
+      autoPlay,
+      currentIndex,
+      items,
+      playingUtterance,
+      systemUtterance
+    } = this.state;
+    if (playingUtterance !== utteranceId && systemUtterance !== utteranceId) {
+      return;
+    }
+
+    if (!autoPlay) {
+      this.setState({
+        playingUtterance: null,
+        systemUtterance: null,
+        ttsState: MusicControl.STATE_STOPPED,
+      });
+      return;
+    }
+
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < items.length) {
+      this.setState({
+        currentIndex: nextIndex
+      }, () => {
+        this.play(items[nextIndex]);
+      });
+    } else {
+      this.setState({
+        playingUtterance: null,
+        systemUtterance: null,
+        ttsState: MusicControl.STATE_STOPPED,
+      });
+    }
+  }
+
+  play(item) {
+    TTS.speak(`標題：${item.title}。描述：${item.description}`).then((utteranceId) => {
+      this.setState({ playingUtterance: utteranceId });
     });
   }
 
@@ -79,6 +172,20 @@ export default class App extends Component<{}> {
     };
   }
 
+  handleDataInserted(newItems) {
+    const { items, ttsState } = this.state;
+
+    if (ttsState !== MusicControl.STATE_STOPPED) {
+      return;
+    }
+
+    const firstItem = items[0];
+
+    TTS.speak('開始報讀新聞.').then((utteranceId) => {
+      this.setState({ systemUtterance: utteranceId });
+    });
+  }
+
   addXMLFeed(url, xml) {
     const newItems = [...this.state.items];
     const channels = _.get(xml, 'rss.channel');
@@ -88,26 +195,8 @@ export default class App extends Component<{}> {
       });
     });
 
-    MusicControl.setNowPlaying({
-      title: newItems[0].title,
-      artist: 'TTS',
-      duration: 294, // (Seconds)
-      description: newItems[0].description
-    });
-
-    this.setState({ items: newItems }, () => {
-      MusicControl.setPlayback({
-        state: MusicControl.STATE_PLAYING,
-        speed: 1,
-        elapsedTime: 103,
-        bufferedTime: 200
-      })
-
-      MusicControl.enableControl('play', true)
-      MusicControl.enableControl('pause', true)
-      MusicControl.enableControl('stop', false)
-      MusicControl.enableControl('nextTrack', true)
-      MusicControl.enableControl('previousTrack', true)
+    this.setState({ items: newItems }, (utteranceId) => {
+      this.handleDataInserted(newItems);
     });
   }
 
