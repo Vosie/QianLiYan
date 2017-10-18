@@ -11,6 +11,7 @@ import _ from 'lodash';
 import MusicControl from 'react-native-music-control';
 import RNExitApp from 'react-native-exit-app';
 
+// This is an fast prototype. We should refactor it to leverage redux.
 const FEED_LIST = ['https://feeds.feedburner.com/TheNewsLens'];
 
 export default class App extends Component<{}> {
@@ -37,13 +38,21 @@ export default class App extends Component<{}> {
   }
 
   componentWillUnmount() {
-
+    MusicControl.resetNowPlaying();
+    this.uninitTTS();
   }
 
   initTTS() {
     TTS.addEventListener('tts-start', this.handleTTSStarted);
     TTS.addEventListener('tts-cancel', this.handleTTSStopped);
     TTS.addEventListener('tts-finish', this.handleTTSStopped);
+  }
+
+  uninitTTS() {
+    TTS.stop();
+    TTS.removeEventListener('tts-start', this.handleTTSStarted);
+    TTS.removeEventListener('tts-cancel', this.handleTTSStopped);
+    TTS.removeEventListener('tts-finish', this.handleTTSStopped);
   }
 
   initMusicControl() {
@@ -60,29 +69,29 @@ export default class App extends Component<{}> {
     MusicControl.enableControl('skipBackward', false)
     MusicControl.on('play', ()=> {
       console.log('play');
-      TTS.stop();
-    })
+      this.forceNext();
+    });
 
     // on iOS this event will also be triggered by the audio router change event.
     // This happens when headphones are unplugged or a bluetooth audio peripheral disconnects from the device
     MusicControl.on('pause', ()=> {
       console.log('trying to stop it.');
-      TTS.stop();
+      this.forceNext();
     });
 
     MusicControl.on('stop', ()=> {
-      TTS.stop();
+      this.forceNext();
     });
 
     MusicControl.on('nextTrack', ()=> {
-      TTS.stop();
+      this.forceNext();
     });
 
     MusicControl.on('previousTrack', ()=> {
       this.setState({
-        currentIndex: this.state.currentIndex - 1
+        currentIndex: this.state.currentIndex - 2
       }, () => {
-        TTS.stop();
+        this.forceNext();
       });
     });
 
@@ -96,24 +105,14 @@ export default class App extends Component<{}> {
     });
   }
 
-  handleTTSStarted(utteranceId) {
-    const { currentIndex, items } = this.state;
-    if (currentIndex < 0 || currentIndex >= items.length) {
-      // if no playing item found, it is playing system voice.
-      return;
-    }
-
-    const playingItem = items[currentIndex];
-
-    MusicControl.setNowPlaying({
-      title: playingItem.title,
-      artist: 'TTS',
-      duration: 1 + (playingItem.title.length + playingItem.description.length) / 7, // (Seconds)
-      description: playingItem.description,
-      ttsState: MusicControl.STATE_PLAYING,
-      speed: 1
+  forceNext() {
+    TTS.stop();
+    this.setState({ playingUtterance: -1 }, () => {
+      this.handleTTSStopped({ utteranceId: -1 });
     });
-    console.log('playing size: ' + (playingItem.title.length + playingItem.description.length));
+  }
+
+  handleTTSStarted(utteranceId) {
   }
 
   handleTTSStopped({ utteranceId }) {
@@ -124,6 +123,7 @@ export default class App extends Component<{}> {
       playingUtterance,
       systemUtterance
     } = this.state;
+
     if (playingUtterance !== utteranceId && systemUtterance !== utteranceId) {
       return;
     }
@@ -142,6 +142,8 @@ export default class App extends Component<{}> {
       this.setState({
         currentIndex: nextIndex
       }, () => {
+        // It would be nice to delay for next playing. But we don't lock anything in this app.
+        // Once we do it, the app will be put in low priority which will stopped to run.
         this.play(items[nextIndex]);
       });
     } else {
@@ -150,19 +152,39 @@ export default class App extends Component<{}> {
         systemUtterance: null,
         ttsState: MusicControl.STATE_STOPPED,
       });
+      TTS.speak('所有新聞已報讀完畢');
     }
   }
 
   play(item) {
-    TTS.speak(`標題：${item.title}。描述：${item.description}`).then((utteranceId) => {
-      this.setState({ playingUtterance: utteranceId });
+    MusicControl.setNowPlaying({
+      title: item.title,
+      artist: 'TTS',
+      duration: 1 + (item.title.length + item.description.length) / 7, // (Seconds)
+      description: item.description,
+      state: MusicControl.STATE_PLAYING,
+      speed: 1
+    });
+    TTS.speak(`標題：${item.title}。`);
+    const lines = item.text.split('。');
+    TTS.speak('本文：');
+    _.forEach(lines, (line, index) => {
+      const promise = TTS.speak(line);
+      if (index === lines.length - 1) {
+        promise.then((utteranceId) => {
+          this.setState({ playingUtterance: utteranceId });
+        }).catch((err) => {
+          this.forceNext();
+          console.error('unable to read news', err, `標題：${item.title}。本文：${item.text}`);
+        });
+      }
     });
   }
 
   convertToFeedItem(url, rssItem) {
     const link = rssItem.link[0] || _.get(rssItem, 'feedburner:origLink[0]');
     return {
-      key: `${url}$${link}`,
+      key: `${link}`,
       sourceURL: url,
       categories: rssItem.category,
       title: rssItem.title.join(', '),
@@ -172,7 +194,7 @@ export default class App extends Component<{}> {
     };
   }
 
-  handleDataInserted(newItems) {
+  handleDataInserted() {
     const { items, ttsState } = this.state;
 
     if (ttsState !== MusicControl.STATE_STOPPED) {
@@ -187,17 +209,68 @@ export default class App extends Component<{}> {
   }
 
   addXMLFeed(url, xml) {
-    const newItems = [...this.state.items];
+    const newItems = [];
     const channels = _.get(xml, 'rss.channel');
     _.forEach(channels, (channel) => {
       _.forEach(channel.item, (item) => {
         newItems.push(this.convertToFeedItem(url, item));
       });
     });
+    this.fetchContent(newItems);
+  }
 
-    this.setState({ items: newItems }, (utteranceId) => {
-      this.handleDataInserted(newItems);
+  fetchSingleItem(item) {
+    const url = `https://qianliyan.herokuapp.com/extract?url=${item.link}&lang=zh-TW`;
+    return fetch(url).then((response) => {
+      return response.text()
+    }).then((text) => {
+      item.text = JSON.parse(text).text;
+      return item.text;
     });
+  }
+
+  fetchContent(newItems) {
+    if (newItems.length < 2) {
+      console.error('The size should not be less then 2: ', newItems);
+      return;
+    }
+    const first = newItems[0];
+    const second = newItems[1];
+    const others = [...newItems];
+    others.splice(0, 2);
+    const firstBatch = [this.fetchSingleItem(first), this.fetchSingleItem(second)];
+    const firstPromise = Promise.all(firstBatch).then(() => {
+      return new Promise((resolve, reject) => {
+        this.setState({
+          items: [
+            ...this.state.items,
+            first,
+            second
+          ]
+        }, () => {
+          this.handleDataInserted();
+          resolve();
+        });
+      });
+    });
+
+    const chained = _.reduce(others, (previous, item) => {
+      return previous.then(() => {
+        return this.fetchSingleItem(item).then(() => {
+          return new Promise((resolve, reject) => {
+            this.setState({
+              items: [
+                ...this.state.items,
+                item
+              ]
+            }, () => {
+              resolve();
+            });
+          });
+        });
+      });
+    }, firstPromise);
+    return chained;
   }
 
   fetchFeeds() {
@@ -221,7 +294,7 @@ export default class App extends Component<{}> {
   }
 
   renderListItem({item, index}) {
-    return (<Text style={styles.listItem}>{item.title}</Text>);
+    return (<Text key={item.link} style={styles.listItem}>{item.title}</Text>);
   }
 
   render() {
