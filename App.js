@@ -48,6 +48,12 @@ export default class App extends Component<{}> {
     TTS.addEventListener('tts-finish', this.handleTTSStopped);
   }
 
+  closeApp() {
+    MusicControl.resetNowPlaying();
+    this.uninitTTS();
+    RNExitApp.exitApp();
+  }
+
   uninitTTS() {
     TTS.stop();
     TTS.removeEventListener('tts-start', this.handleTTSStarted);
@@ -99,8 +105,7 @@ export default class App extends Component<{}> {
       this.setState({
         autoPlay: false
       }, () => {
-        TTS.stop();
-        RNExitApp.exitApp();
+        this.closeApp();
       });
     });
   }
@@ -117,6 +122,7 @@ export default class App extends Component<{}> {
 
   handleTTSStopped({ utteranceId }) {
     const {
+      autoClosed,
       autoPlay,
       currentIndex,
       items,
@@ -125,6 +131,11 @@ export default class App extends Component<{}> {
     } = this.state;
 
     if (playingUtterance !== utteranceId && systemUtterance !== utteranceId) {
+      return;
+    }
+
+    if (autoClosed) {
+      this.closeApp();
       return;
     }
 
@@ -152,13 +163,21 @@ export default class App extends Component<{}> {
         systemUtterance: null,
         ttsState: MusicControl.STATE_STOPPED,
       });
-      TTS.speak('所有新聞已報讀完畢');
+
+      TTS.speak('所有新聞已報讀完畢，程式將自動關閉').then((utteranceId) => {
+        this.setState({
+          autoPlay: false,
+          autoClosed: true,
+          systemUtterance: utteranceId
+        });
+      });
     }
   }
 
   play(item) {
+    const { items, currentIndex } = this.state;
     MusicControl.setNowPlaying({
-      title: item.title,
+      title: `(${currentIndex + 1}/${items.length}) - ${item.title}`,
       artist: 'TTS',
       duration: 1 + (item.title.length + item.description.length) / 7, // (Seconds)
       description: item.description,
