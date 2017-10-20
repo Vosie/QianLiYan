@@ -26,7 +26,7 @@ export default class App extends Component<{}> {
       systemUtterance: null,
       ttsState: MusicControl.STATE_STOPPED
     };
-    this.renderListItem = this.renderListItem.bind(this);
+    this.renderListItem = ::this.renderListItem;
     this.handleTTSStarted = this.handleTTSStarted.bind(this);
     this.handleTTSStopped = this.handleTTSStopped.bind(this);
   }
