@@ -1,4 +1,4 @@
 import { AppRegistry } from 'react-native';
-import App from './src/App';
+import Main from './src/Main';
 
-AppRegistry.registerComponent('QianLiYan', () => App);
+AppRegistry.registerComponent('QianLiYan', () => Main);
