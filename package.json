@@ -7,12 +7,11 @@
     "test": "jest"
   },
   "dependencies": {
-    "i18next": "10.0.2",
     "lodash": "4.17.4",
     "react": "16.0.0-beta.5",
-    "react-i18next": "6.0.6",
     "react-native": "0.49.3",
     "react-native-exit-app": "1.0.0",
+    "react-native-i18n": "^2.0.8",
     "react-native-music-control": "0.4.12",
     "react-native-router-flux": "4.0.0-beta.22",
     "react-native-tts": "1.4.1",

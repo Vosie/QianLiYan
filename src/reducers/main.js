@@ -1,3 +1,3 @@
-import tts from './tts';
+import ttsPlayer from './tts_player';
 
-export default { tts };
+export default { ttsPlayer };

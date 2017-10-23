@@ -11,8 +11,8 @@ const composeEnhancers = typeof window === 'object' && window.__REDUX_DEVTOOLS_E
                             ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({}) : compose;
 
 export const createReduxStore = () => {
-  const middleware = composeEnhancers(applyMiddleware(thunk));
-  const rootReducer = combineReducers(reducers);
+    const middleware = composeEnhancers(applyMiddleware(thunk));
+    const rootReducer = combineReducers(reducers);
 
-  return createStore(rootReducer, middleware);
+    return createStore(rootReducer, middleware);
 };
