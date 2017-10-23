@@ -1,44 +1,44 @@
 import TTS from 'react-native-tts';
 import { createAction } from 'redux-actions';
-import { actionTypes, states } from '../constants/tts_player';
+import PlayerError from '../shared/player_error';
+import {
+    ERROR_CODES,
+    actionTypes,
+    states
+} from '../constants/tts_player';
+import TTSApi from '../services/tts_api';
 
 const setState = createAction(actionTypes.SET_STATE);
 const setPlayingItem = createAction(actionTypes.SET_PLAYINGITEM);
 const setUtteranceId = createAction(actionTypes.SET_UTTERANCEID);
 const setPlayingIndex = createAction(actionTypes.SET_PLAYINGINDEX);
 
-const idMap = {};
-
-TTS.addEventListener('tts-cancel', this.handleTTSStopped);
-TTS.addEventListener('tts-finish', ({ utteranceId }) => {
-    idMap[utteranceId] && idMap[utteranceId]();
-});
-
-const TTSPlay = (text) => {
-    return new Promise((resolve, reject) => {
-        TTS.speak(text).then((utteranceId) => {
-            idMap[utteranceId] = resolve;
-        }).catch((ex) => {
-            reject(ex);
-        });
-    });
-};
-
 const playIndex = (index) => (dispatch, getState) => {
     const { playingList } = getState().ttsPlayer;
     if (index < 0 || index >= playingList.length) {
-        return Promise.reject('wrong index number');
+        return Promise.reject(new PlayerError(ERROR_CODES.WRONG_INDEX));
     }
     dispatch(setPlayingIndex(index));
-    return TTSPlay(playingList[index]);
+    // We need to think if we should put the seperator back because it may
+    // affect the reading speed.
+    return TTSApi.play(playingList[index]);
 };
 
-const readToEnd = (dispatch) => {
-    dispatch(playNextIndex()).then(() => {
-        readToEnd(dispatch);
+const readToEnd = (dispatch, getState) => {
+    return dispatch(playNextIndex()).then(() => {
+        if (getState().ttsPlayer.state === states.PLAYING) {
+            return readToEnd(dispatch, getState);
+        } else {
+            return null;
+        }
     }).catch((ex) => {
-        // capture the error
-        console.log(ex);
+        if (ex.code === ERROR_CODES.WRONG_INDEX) {
+            // it plays to end. we should capture this error.
+            return null;
+        } else {
+            console.log(ex);
+            throw ex;
+        }
     });
 };
 
@@ -46,9 +46,9 @@ export const play = (item) => (dispatch, getState) => {
     dispatch(setState(states.PLAYING));
     dispatch(setPlayingItem(item));
     dispatch(setPlayingIndex(-1));
-    return TTSPlay(`標題：${item.title}。`).then(() => {
-        return TTS.speak('本文：').then(() => {
-            readToEnd(dispatch);
+    return TTSApi.play(`標題：${item.title}。`).then(() => {
+        return TTSApi.play('本文：').then(() => {
+            return readToEnd(dispatch, getState);
         });
     }).catch((ex) => {
         console.error('unable to speak', ex);

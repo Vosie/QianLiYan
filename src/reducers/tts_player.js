@@ -13,15 +13,14 @@ const initState = {
 
 const setPlayingItem = (state, payload) => {
     const separator = i18n.t('tts_player.sentence_seperator');
-    // split by separator and put the separator back to line.
+    // split by separator
+    // We need to think if we should put the seperator back because it may
+    // affect the reading speed.
     const sentences = payload.text.split(separator);
-    const playingList = _.map(sentences, (line) => {
-        return `${line}${separator}`;
-    });
     return {
         ...state,
         playingItem: _.cloneDeep(payload),
-        playingList: playingList,
+        playingList: sentences,
         playingIndex: -1
     };
 };
