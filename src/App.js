@@ -70,9 +70,9 @@ export default class App extends Component<{}> {
     MusicControl.enableControl('nextTrack', true);
     MusicControl.enableControl('previousTrack', true);
     //
-    MusicControl.enableControl('seek', false) // Android only
-    MusicControl.enableControl('skipForward', false)
-    MusicControl.enableControl('skipBackward', false)
+    MusicControl.enableControl('seek', false); // Android only
+    MusicControl.enableControl('skipForward', false);
+    MusicControl.enableControl('skipBackward', false);
     MusicControl.on('play', ()=> {
       console.log('play');
       this.forceNext();
@@ -241,7 +241,7 @@ export default class App extends Component<{}> {
   fetchSingleItem(item) {
     const url = `https://qianliyan.herokuapp.com/extract?url=${item.link}&lang=zh-TW`;
     return fetch(url).then((response) => {
-      return response.text()
+      return response.text();
     }).then((text) => {
       item.text = JSON.parse(text).text;
       return item.text;

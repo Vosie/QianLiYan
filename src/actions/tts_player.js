@@ -20,7 +20,7 @@ const playIndex = (index) => (dispatch, getState) => {
         return Promise.reject(new PlayerError(ERROR_CODES.WRONG_INDEX));
     }
     dispatch(setPlayingIndex(index));
-    // We need to think if we should put the seperator back because it may
+    // We need to think if we should put the separator back because it may
     // affect the reading speed.
     return TTSApi.play(playingList[index]);
 };
@@ -28,7 +28,7 @@ const playIndex = (index) => (dispatch, getState) => {
 const readToEnd = (dispatch, getState) => {
     return dispatch(playNextIndex()).then(() => {
         if (getState().ttsPlayer.state !== states.PLAYING) {
-            throw new PlayerError(ERROR_CODES.STATE_MISMATCHED)
+            throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
         }
         return readToEnd(dispatch, getState);
     }).catch((ex) => {

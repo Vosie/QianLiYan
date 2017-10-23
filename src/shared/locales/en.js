@@ -1,4 +1,7 @@
 export default {
+    rss: {
+        item_text_separator: ', '
+    },
     tts_player: {
         // tts is a group of system message for hinting the start of TTS playing
         // So, we will use TTS to read the text here.
@@ -7,7 +10,7 @@ export default {
             play_title: 'title: {{title}}',
             resume_playing: 'resume playing: {{title}}'
         },
-        sentence_seperator: '.'
+        sentence_separator: '.'
     },
     errors: {
         1001: 'Player tries to play inexisting text.',

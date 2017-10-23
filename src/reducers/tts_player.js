@@ -12,9 +12,9 @@ const initState = {
 };
 
 const setPlayingItem = (state, payload) => {
-    const separator = i18n.t('tts_player.sentence_seperator');
+    const separator = i18n.t('tts_player.sentence_separator');
     // split by separator
-    // We need to think if we should put the seperator back because it may
+    // We need to think if we should put the separator back because it may
     // affect the reading speed.
     const sentences = payload.text.split(separator);
     return {

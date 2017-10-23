@@ -1,0 +1,28 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es6": true
+    },
+    "parser": "babel-eslint",
+    "parserOptions": {
+        "sourceType": "module",
+        "allowImportExportEverywhere": false,
+        "codeFrame": false
+    },
+    "plugins": [
+        "react",
+        "react-native"
+    ],
+    "rules": {
+        "comma-spacing": "error",
+        "max-depth": ["error", 4],
+        "max-nested-callbacks": ["error", 4],
+        "no-compare-neg-zero": "error",
+        "no-undef": "error",
+        "react-native/no-inline-styles": "error",
+        "react-native/no-unused-styles": "error",
+        "semi": "error",
+        "strict": "error"
+    }
+}
