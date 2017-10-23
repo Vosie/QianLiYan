@@ -1,5 +1,6 @@
 import TTS from 'react-native-tts';
 import { createAction } from 'redux-actions';
+import i18n from '../shared/i18n';
 import PlayerError from '../shared/player_error';
 import {
     ERROR_CODES,
@@ -26,11 +27,10 @@ const playIndex = (index) => (dispatch, getState) => {
 
 const readToEnd = (dispatch, getState) => {
     return dispatch(playNextIndex()).then(() => {
-        if (getState().ttsPlayer.state === states.PLAYING) {
-            return readToEnd(dispatch, getState);
-        } else {
-            return null;
+        if (getState().ttsPlayer.state !== states.PLAYING) {
+            throw new PlayerError(ERROR_CODES.STATE_MISMATCHED)
         }
+        return readToEnd(dispatch, getState);
     }).catch((ex) => {
         if (ex.code === ERROR_CODES.WRONG_INDEX) {
             // it plays to end. we should capture this error.
@@ -46,12 +46,20 @@ export const play = (item) => (dispatch, getState) => {
     dispatch(setState(states.PLAYING));
     dispatch(setPlayingItem(item));
     dispatch(setPlayingIndex(-1));
-    return TTSApi.play(`標題：${item.title}。`).then(() => {
-        return TTSApi.play('本文：').then(() => {
+    return TTSApi.play(i18n.t('tts_player.tts.play_title', { title: item.title })).then(() => {
+        if (getState().ttsPlayer.state !== states.PLAYING) {
+            throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
+        }
+
+        return TTSApi.play(i18n.t('tts_player.tts.play_content', {content: ''})).then(() => {
+            if (getState().ttsPlayer.state !== states.PLAYING) {
+                throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
+            }
             return readToEnd(dispatch, getState);
         });
     }).catch((ex) => {
         console.error('unable to speak', ex);
+        throw ex;
     });
 };
 
@@ -65,5 +73,51 @@ export const playPreviousIndex = () => (dispatch, getState) => {
     return dispatch(playIndex(playingIndex - 1));
 };
 
-export const pause = () => (dispatch, getState) => {};
-export const stop = () => (dispatch, getState) => {};
+export const resume = () => (dispatch, getState) => {
+    const { playingIndex, playingItem } = getState().ttsPlayer;
+
+    dispatch(setState(states.PLAYING));
+    const hintText = i18n.t('tts_player.tts.resume_playing', { title: playingItem.title });
+
+    return TTSApi.play(hintText).then(() => {
+        if (getState().ttsPlayer.state !== states.PLAYING) {
+            throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
+        }
+        // resume playing at the start of paused index.
+        return playIndex(playingIndex).then(() => {
+            if (getState().ttsPlayer.state !== states.PLAYING) {
+                throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
+            }
+            return readToEnd(dispatch, getState);
+        });
+    }).catch((ex) => {
+        console.error('unable to speak', ex);
+        throw ex;
+    });
+};
+
+export const pause = () => (dispatch, getState) => {
+    // We only set the state to pausing or paused but not reset others.
+    dispatch(setState(states.PAUSING));
+    return TTSApi.stop().then((res) => {
+        dispatch(setState(states.PAUSD));
+    }).catch((ex) => {
+        dispatch(setState(states.PAUSD));
+    });
+};
+
+export const stop = () => (dispatch, getState) => {
+    // reset the playing item and index when it is stopped.
+    dispatch(setState(states.STOPPING));
+    return TTSApi.stop().then((res) => {
+        dispatch(setState(states.STOPPED));
+        dispatch(setPlayingItem(null));
+        dispatch(setPlayingIndex(-1));
+        return res;
+    }).catch((ex) => {
+        dispatch(setState(states.STOPPED));
+        dispatch(setPlayingItem(null));
+        dispatch(setPlayingIndex(-1));
+        throw ex;
+    });
+};

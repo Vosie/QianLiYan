@@ -12,5 +12,6 @@ export const actionTypes = createActionMap(actionList, 'tts_player.action');
 export const states = createActionMap(stateList, 'tts_player.state');
 
 export const ERROR_CODES = {
-    WRONG_INDEX: 1001
+    WRONG_INDEX: 1001,
+    STATE_MISMATCHED: 1002
 };

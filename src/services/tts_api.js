@@ -58,6 +58,10 @@ class TTSApi {
         });
     }
 
+    stop() {
+        return TTS.stop();
+    }
+
 }
 
 const singleton = new TTSApi();
