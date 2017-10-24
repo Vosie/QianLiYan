@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import i18n from '../shared/i18n';
-import { actionTypes, states } from '../constants/tts_player';
+import { PLAYER_STATES, actionTypes } from '../constants/tts_player';
 import { mapReducerActions } from './reducer_utils';
 
 const initState = {
-    state: states.STOPPED,
+    state: PLAYER_STATES.STOPPED,
     playingItem: null,
     playingList: [],
     playingIndex: -1,
