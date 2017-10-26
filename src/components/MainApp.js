@@ -8,13 +8,26 @@ import TTSPlayer from './TTSPlayer';
 
 class AppContainer extends PureComponent {
 
+    constructor(props) {
+        super(props);
+        // use this flag to make sure the auto play is triggered once after the app is opened.
+        this.autoPlayTriggered = false;
+    }
+
     componentDidMount() {
         this.props.fetchList();
     }
 
+    componentDidUpdate(prevProps) {
+        if (!prevProps.canPlay && this.props.canPlay && !this.autoPlayTriggered) {
+            this.autoPlayTriggered = true;
+            this.props.autoPlay();
+        }
+    }
+
     render() {
-        const { loading, store } = this.props;
-        if (loading) {
+        const { canPlay, store } = this.props;
+        if (!canPlay) {
             return (
                 <ActivityIndicator animating={true} size='large' style={style.loading} />
             );
@@ -31,7 +44,7 @@ class AppContainer extends PureComponent {
 
 const mapStateToProps = (state) => {
     return {
-        loading: !state.contentList.canPlay
+        canPlay: !state.contentList.canPlay
     };
 };
 

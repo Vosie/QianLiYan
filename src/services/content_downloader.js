@@ -12,7 +12,7 @@ class ContentRunner {
     }
 
     process(json, task) {
-        task.resolve(json.text);
+        task.resolve({ text: json.text, lang: json.lang || task.url.lang });
     }
 }
 

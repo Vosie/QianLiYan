@@ -26,6 +26,7 @@ const setContentText = (state, payload) => {
     const item = _.find(list, ['key', payload.key]);
     if (item) {
         item.text = payload.text;
+        item.lang = payload.lang;
     }
 
     let counter = 0;

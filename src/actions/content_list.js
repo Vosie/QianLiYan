@@ -15,9 +15,13 @@ const setContentText = createAction(ACTION_TYPES.SET_CONTENT_TEXT);
 
 const fetchContent = (feed, list) => (dispatch, getState) => {
     return Promise.all(_.map(list, (item) => {
-        ContentDownloader.download({ link: item.link, lang: feed.lang }).then((text) => {
-            dispatch(setContentText({ key: item.key, text }));
-            return text;
+        ContentDownloader.download({ link: item.link, lang: feed.lang }).then((data) => {
+            dispatch(setContentText({
+                key: item.key,
+                text: data.text,
+                lang: data.lang
+            }));
+            return data;
         }).catch((ex) => {
             console.error('download content error, from', item.link, feed.name, feed.url);
             // eat the error to prevent app halt

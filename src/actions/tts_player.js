@@ -41,6 +41,21 @@ const readToEnd = (dispatch, getState) => {
     });
 };
 
+export const autoPlay = () => (dispatch, getState) => {
+    const items = getState().contentList.list;
+    const playable = _.find(items, (item) => {
+        return !item.played && item.text;
+    });
+
+    if (!playable) {
+        return Promise.resolve();
+    }
+
+    return dispatch(play(playable)).then(() => {
+        return dispatch(autoPlay());
+    });
+};
+
 export const play = (item) => (dispatch, getState) => {
     dispatch(setState(PLAYER_STATES.PLAYING));
     dispatch(setPlayingItem(item));
