@@ -8,7 +8,7 @@ const actionList = [
 ];
 const stateList = ['PLAYING', 'STOPPING', 'STOPPED', 'PAUSING', 'PAUSED'];
 
-export const actionTypes = createActionMap(actionList, 'tts_player.action');
+export const ACTION_TYPES = createActionMap(actionList, 'tts_player.action');
 export const PLAYER_STATES = createActionMap(stateList, 'tts_player.state');
 
 export const ERROR_CODES = {

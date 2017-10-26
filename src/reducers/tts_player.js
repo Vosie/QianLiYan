@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import i18n from '../shared/i18n';
-import { PLAYER_STATES, actionTypes } from '../constants/tts_player';
+import { ACTION_TYPES, PLAYER_STATES } from '../constants/tts_player';
 import { mapReducerActions } from './reducer_utils';
 
 const initState = {
@@ -26,13 +26,13 @@ const setPlayingItem = (state, payload) => {
 };
 
 const type2StateMap = {
-    [actionTypes.SET_STATE]: 'state',
-    [actionTypes.SET_UTTERANCEID]: 'utteranceId',
-    [actionTypes.SET_PLAYINGINDEX]: 'playingIndex'
+    [ACTION_TYPES.SET_STATE]: 'state',
+    [ACTION_TYPES.SET_UTTERANCEID]: 'utteranceId',
+    [ACTION_TYPES.SET_PLAYINGINDEX]: 'playingIndex'
 };
 
 const type2FuncMap = {
-    [actionTypes.SET_PLAYINGITEM]: setPlayingItem
+    [ACTION_TYPES.SET_PLAYINGITEM]: setPlayingItem
 };
 
 export default mapReducerActions(type2StateMap, type2FuncMap, initState);

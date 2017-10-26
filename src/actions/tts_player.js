@@ -1,18 +1,17 @@
-import TTS from 'react-native-tts';
 import { createAction } from 'redux-actions';
 import i18n from '../shared/i18n';
 import PlayerError from '../shared/player_error';
 import {
+    ACTION_TYPES,
     ERROR_CODES,
-    PLAYER_STATES,
-    actionTypes
+    PLAYER_STATES
 } from '../constants/tts_player';
 import TTSApi from '../services/tts_api';
 
-const setState = createAction(actionTypes.SET_STATE);
-const setPlayingItem = createAction(actionTypes.SET_PLAYINGITEM);
-const setUtteranceId = createAction(actionTypes.SET_UTTERANCEID);
-const setPlayingIndex = createAction(actionTypes.SET_PLAYINGINDEX);
+const setState = createAction(ACTION_TYPES.SET_STATE);
+const setPlayingItem = createAction(ACTION_TYPES.SET_PLAYINGITEM);
+const setUtteranceId = createAction(ACTION_TYPES.SET_UTTERANCEID);
+const setPlayingIndex = createAction(ACTION_TYPES.SET_PLAYINGINDEX);
 
 const playIndex = (index) => (dispatch, getState) => {
     const { playingList } = getState().ttsPlayer;

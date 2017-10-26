@@ -1,36 +1,16 @@
 import _ from 'lodash';
 import i18n from '../shared/i18n';
 import { fetchXML } from '../shared/fetcher';
+import BaseDownloader from './base_downloader';
 
-export class RSSDownloader {
+class RSSRunner {
 
-    constructor() {
-        this._queue = [];
-        this.running = false;
-
-        this._fetchNext = ::this._fetchNext;
+    fetch() {
+        return fetchXML.apply(null, arguments);
     }
 
-    _fetchNext() {
-        const task = this._queue.shift();
-
-        if (!task) {
-            this.running = false;
-            return;
-        }
-
-        fetchXML(task.url).then((xml) => {
-            try {
-                task.resolve(this.convertToRSSItems(task.url, xml));
-            } finally {
-                // We have to continue fetch no matter it is failed or not.
-                this.setTimeout(this._fetchNext);
-            }
-        }).catch((ex) => {
-            task.reject(ex);
-            // We have to continue fetch no matter it is failed or not.
-            this.setTimeout(this._fetchNext);
-        });
+    process(xml, task) {
+        task.resolve(this.convertToRSSItems(task.url, xml));
     }
 
     convertToRSSItem(sourceURL, item) {
@@ -59,28 +39,8 @@ export class RSSDownloader {
             }, acc);
         }, []);
     }
-
-    trigger() {
-        if (this.running) {
-            return;
-        }
-
-        this.running = true;
-        this._fetchNext();
-    }
-
-    download(url) {
-        return new Promise((resolve, reject) => {
-            this._queue.push({
-                url,
-                resolve,
-                reject
-            });
-            this.trigger();
-        });
-    }
 }
 
-const singleton = new RSSDownloader();
+const singleton = new BaseDownloader(new RSSRunner());
 
 export default singleton;
