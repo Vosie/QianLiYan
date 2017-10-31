@@ -1,14 +1,15 @@
 import _ from 'lodash';
+import extractText from '../unfluff/unfluff';
 import i18n from '../shared/i18n';
-import { fetchJSON } from '../shared/fetcher';
+import { fetchText } from '../shared/fetcher';
 import BaseDownloader from './base_downloader';
 
 class ContentRunner {
 
-    fetch(item) {
-        // This part should be changed to embed unfluff code.
-        const url = `https://qianliyan.herokuapp.com/extract?url=${item.link}&lang=${item.lang}`;
-        return fetchJSON(url);
+    fetch(url) {
+        return fetchText(url.link).then((html) => {
+            return extractText(html, url.lang);
+        });
     }
 
     process(json, task) {
