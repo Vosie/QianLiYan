@@ -8,7 +8,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "cheerio": "0.17.0",
     "lodash": "4.17.4",
+    "optimist": "0.6.1",
     "react": "16.0.0-beta.5",
     "react-native": "0.49.3",
     "react-native-exit-app": "1.0.0",
@@ -20,7 +22,8 @@
     "react-redux": "5.0.6",
     "redux": "3.7.2",
     "redux-actions": "2.2.1",
-    "redux-thunk": "2.2.0"
+    "redux-thunk": "2.2.0",
+    "xregexp": "2.0.0"
   },
   "devDependencies": {
     "babel-eslint": "8.0.1",
