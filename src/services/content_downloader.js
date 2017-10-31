@@ -7,9 +7,7 @@ import BaseDownloader from './base_downloader';
 class ContentRunner {
 
     fetch(url) {
-        return fetchText(url.link).then((html) => {
-            return extractText(html, url.lang);
-        });
+        return fetchText(url.link).then((html) => (extractText(html, url.lang)));
     }
 
     process(json, task) {
@@ -18,5 +16,10 @@ class ContentRunner {
 }
 
 const singleton = new BaseDownloader(new ContentRunner());
+
+// We should use throttling to prevent overwhelming requesting.
+singleton.throttle = () => {
+    return Math.random() * 5000 + 1000;
+};
 
 export default singleton;

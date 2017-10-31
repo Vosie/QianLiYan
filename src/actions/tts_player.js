@@ -1,4 +1,5 @@
 import { createAction } from 'redux-actions';
+import _ from 'lodash';
 import i18n from '../shared/i18n';
 import PlayerError from '../shared/player_error';
 import {
@@ -35,7 +36,7 @@ const readToEnd = (dispatch, getState) => {
             // it plays to end. we should capture this error.
             return null;
         } else {
-            console.log(ex);
+            console.error(ex);
             throw ex;
         }
     });

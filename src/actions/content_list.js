@@ -23,7 +23,7 @@ const fetchContent = (feed, list) => (dispatch, getState) => {
             }));
             return data;
         }).catch((ex) => {
-            console.error('download content error, from', item.link, feed.name, feed.url);
+            console.error('download content error, from', item.link, feed.name, feed.url, ex);
             // eat the error to prevent app halt
         });
     }));

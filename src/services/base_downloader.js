@@ -23,12 +23,12 @@ class BaseDownloader {
                 this._runner.process(obj, task);
             } finally {
                 // We have to continue fetch no matter it is failed or not.
-                setTimeout(this._fetchNext);
+                setTimeout(this._fetchNext, this.throttle ? this.throttle() : 0);
             }
         }).catch((ex) => {
             task.reject(ex);
             // We have to continue fetch no matter it is failed or not.
-            setTimeout(this._fetchNext);
+            setTimeout(this._fetchNext, this.throttle ? this.throttle() : 0);
         });
     }
 

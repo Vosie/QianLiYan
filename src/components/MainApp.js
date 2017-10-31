@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { connect } from 'react-redux';
 import { fetchList } from '../actions/content_list';
+import { autoPlay } from '../actions/tts_player';
 import style from './styles/main_app';
 import ContentList from './ContentList';
 import TTSPlayer from './TTSPlayer';
@@ -44,11 +45,12 @@ class AppContainer extends PureComponent {
 
 const mapStateToProps = (state) => {
     return {
-        canPlay: !state.contentList.canPlay
+        canPlay: state.contentList.canPlay
     };
 };
 
 const mapActionsToProps = {
+    autoPlay,
     fetchList
 };
 
