@@ -32,7 +32,7 @@ class ContentList extends PureComponent {
             <FlatList
               data={contentList}
               renderItem={this.renderListItem}
-              style={style} />
+              style={style.list} />
         );
     }
 }
