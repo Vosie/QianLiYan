@@ -1,10 +1,13 @@
 import React, { PureComponent } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { connect } from 'react-redux';
+import RNExitApp from 'react-native-exit-app';
 import { fetchList } from '../actions/content_list';
 import { autoPlay } from '../actions/tts_player';
 import ContentList from '../components/ContentList';
 import TTSPlayer from '../components/TTSPlayer';
+import TTSApi from '../services/tts_api';
+import NotificationHelper from '../services/notification_helper';
 import style from './styles/main_app';
 
 class AppContainer extends PureComponent {
@@ -17,6 +20,11 @@ class AppContainer extends PureComponent {
 
     componentDidMount() {
         this.props.fetchList();
+        NotificationHelper.onNotificationClosed(() => {
+            TTSApi.close();
+            NotificationHelper.close();
+            RNExitApp.exitApp();
+        });
     }
 
     componentDidUpdate(prevProps) {
@@ -24,6 +32,11 @@ class AppContainer extends PureComponent {
             this.autoPlayTriggered = true;
             this.props.autoPlay();
         }
+    }
+
+    componentWillUnmount() {
+        TTSApi.close();
+        NotificationHelper.close();
     }
 
     render() {

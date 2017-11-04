@@ -42,6 +42,13 @@ class NotificationHelper {
         MusicControl.resetNowPlaying();
     }
 
+    onNotificationClosed(fn) {
+        // TODO: rewrite this as a good event handler model.
+        MusicControl.on('closeNotification', () => {
+            fn();
+        });
+    }
+
 }
 
 const singleton = new NotificationHelper();

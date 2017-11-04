@@ -29,19 +29,25 @@ const playIndex = (index) => (dispatch, getState) => {
     return TTSApi.play(playingList[index]);
 };
 
-const readToEnd = (dispatch, getState) => {
+const readToEnd = (item, dispatch, getState) => {
     return dispatch(playNextIndex()).then(() => {
-        if (getState().ttsPlayer.state !== PLAYER_STATES.PLAYING) {
+        const {
+            state,
+            playingItem
+        } = getState().ttsPlayer;
+
+        if (state !== PLAYER_STATES.PLAYING) {
+            throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
+        } else if (!playingItem || playingItem.key !== item.key) {
             throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
         }
-        return readToEnd(dispatch, getState);
+        return readToEnd(item, dispatch, getState);
     }).catch((ex) => {
         if (ex.code === ERROR_CODES.WRONG_INDEX) {
             // it plays to end. we should capture this error.
             dispatch(setContentPlayed(getState().ttsPlayer.playingItem));
             return null;
         } else {
-            console.error(ex);
             throw ex;
         }
     });
@@ -63,6 +69,8 @@ export const autoPlay = () => (dispatch, getState) => {
 
     return dispatch(play(playable)).then(() => {
         return dispatch(autoPlay());
+    }).catch((ex) => {
+        console.log('something wrong while autoplaying', ex);
     });
 };
 
@@ -71,9 +79,7 @@ export const play = (item) => (dispatch, getState) => {
     // current playing item had been removed. We just play next playable.
     if (playerState === PLAYER_STATES.PLAYING) {
         return dispatch(stop()).then(() => {
-            dispatch(playItem(item));
-        }).catch((ex) => {
-            debugger;
+            return dispatch(playItem(item));
         });
     } else {
         return dispatch(playItem(item));
@@ -96,7 +102,8 @@ const playItem = (item) => (dispatch, getState) => {
     // update notification
     NotificationHelper.setPlaying(itemForPlay, itemIndex, contentList.length);
     // start to play
-    return TTSApi.play(i18n.t('tts_player.tts.play_title', { title: item.title })).then(() => {
+    const titleText = i18n.t('tts_player.tts.play_title', { title: itemForPlay.title });
+    return TTSApi.play(titleText).then(() => {
         if (getState().ttsPlayer.state !== PLAYER_STATES.PLAYING) {
             throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
         }
@@ -105,14 +112,11 @@ const playItem = (item) => (dispatch, getState) => {
             if (getState().ttsPlayer.state !== PLAYER_STATES.PLAYING) {
                 throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
             }
-            return readToEnd(dispatch, getState);
+            return readToEnd(itemForPlay, dispatch, getState);
         });
     }).catch((ex) => {
-        if (ex.code === ERROR_CODES.STATE_MISMATCHED) {
-            // someone tries to stop the playing. We should accept it.
-            return null;
-        }
-        console.error('unable to speak', ex);
+        // DO NOT consume the STATE_MISMATCHED because auto play need it to know if someone
+        // interrupt the playing.
         throw ex;
     });
 };
@@ -142,10 +146,9 @@ export const resume = () => (dispatch, getState) => {
             if (getState().ttsPlayer.state !== PLAYER_STATES.PLAYING) {
                 throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
             }
-            return readToEnd(dispatch, getState);
+            return readToEnd(playingItem, dispatch, getState);
         });
     }).catch((ex) => {
-        console.error('unable to speak', ex);
         throw ex;
     });
 };
@@ -186,7 +189,10 @@ export const playNextItem = () => (dispatch, getState) => {
         TTSApi.play(i18n.t('tts_player.tts.end_of_list'));
     } else {
         // the current index can move next.
-        dispatch(play(contentList[itemIndex + 1]));
+        dispatch(play(contentList[itemIndex + 1])).catch((ex) => {
+            // consume errors
+            console.log('play next item error', ex);
+        });
     }
 };
 
@@ -201,6 +207,9 @@ export const playPreviousItem = () => (dispatch, getState) => {
         TTSApi.play(i18n.t('tts_player.tts.start_of_list'));
     } else {
         // the current index can move next.
-        return dispatch(play(contentList[itemIndex - 1]));
+        return dispatch(play(contentList[itemIndex - 1])).catch((ex) => {
+            // consume errors
+            console.log('play next item error', ex);
+        });
     }
 };

@@ -57,6 +57,7 @@ class MusicEventSource {
         MusicControl.enableControl('seek', false); // Android only
         MusicControl.enableControl('skipForward', false);
         MusicControl.enableControl('skipBackward', false);
+        MusicControl.enableControl('closeNotification', true, {when: 'always'}); // Android only
         MusicControl.on('play', ()=> {
             this.triggerEvent('play');
         });
@@ -78,10 +79,6 @@ class MusicEventSource {
 
         MusicControl.on('previousTrack', ()=> {
             this.triggerEvent('previousTrack');
-        });
-
-        MusicControl.on('closeNotification', () => {
-            this.triggerEvent('close');
         });
     }
 }

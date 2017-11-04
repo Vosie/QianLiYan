@@ -14,6 +14,11 @@ class TTSApi {
         TTS.addEventListener('tts-finish', this.handleTTSStopped);
     }
 
+    uninitEventListeners() {
+        TTS.removeEventListener('tts-cancel', this.handleTTSCancelled);
+        TTS.removeEventListener('tts-finish', this.handleTTSStopped);
+    }
+
     handleTTSCancelled({ utteranceId }) {
         if (!this._playMap[utteranceId]) {
             return;
@@ -60,6 +65,11 @@ class TTSApi {
 
     stop() {
         return TTS.stop();
+    }
+
+    close() {
+        this.stop();
+        this.uninitEventListeners();
     }
 
 }

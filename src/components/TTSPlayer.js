@@ -11,6 +11,7 @@ import {
     stop
 } from '../actions/tts_player';
 import avEventSource from '../services/av_event_source';
+import NotificationHelper from '../services/notification_helper';
 import style from './styles/tts_player';
 
 class TTSPlayer extends PureComponent {
