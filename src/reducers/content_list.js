@@ -45,6 +45,23 @@ const setContentText = (state, payload) => {
     };
 };
 
+const setContentPlayed = (state, payload) => {
+    // clone the list to let purecomponent re-render.
+    const list = [...state.list];
+
+    const itemIndex = _.findIndex(list, ['key', payload.key]);
+    if (itemIndex > -1) {
+        list.splice(itemIndex, 1, {
+            ...list[itemIndex],
+            played: true
+        });
+    }
+
+    return {
+        ...state,
+        list
+    };
+};
 
 const type2StateMap = {
     [ACTION_TYPES.SET_DOWNLOADER_STATE]: 'state'
@@ -52,6 +69,7 @@ const type2StateMap = {
 
 const type2FuncMap = {
     [ACTION_TYPES.ADD_CONTENT_LIST]: addContentList,
+    [ACTION_TYPES.SET_CONTENT_PLAYED]: setContentPlayed,
     [ACTION_TYPES.SET_CONTENT_TEXT]: setContentText
 };
 

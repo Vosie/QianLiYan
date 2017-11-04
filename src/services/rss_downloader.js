@@ -26,6 +26,7 @@ class RSSRunner {
             sourceURL,
             link,
             categories: item.category,
+            played: false,
             pubDate: item.pubDate && item.pubDate.length ? item.pubDate[0] : null,
             text: null
         };

@@ -3,9 +3,9 @@ import { ActivityIndicator, View } from 'react-native';
 import { connect } from 'react-redux';
 import { fetchList } from '../actions/content_list';
 import { autoPlay } from '../actions/tts_player';
+import ContentList from '../components/ContentList';
+import TTSPlayer from '../components/TTSPlayer';
 import style from './styles/main_app';
-import ContentList from './ContentList';
-import TTSPlayer from './TTSPlayer';
 
 class AppContainer extends PureComponent {
 

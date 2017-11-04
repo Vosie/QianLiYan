@@ -12,6 +12,8 @@ import ContentDownloader from '../services/content_downloader';
 const setState = createAction(ACTION_TYPES.SET_DOWNLOADER_STATE);
 const addContentList = createAction(ACTION_TYPES.ADD_CONTENT_LIST);
 const setContentText = createAction(ACTION_TYPES.SET_CONTENT_TEXT);
+// This is used by others, at least tts_player.
+export const setContentPlayed = createAction(ACTION_TYPES.SET_CONTENT_PLAYED);
 
 const fetchContent = (feed, list) => (dispatch, getState) => {
     return Promise.all(_.map(list, (item) => {

@@ -8,7 +8,9 @@ export default {
         tts: {
             play_content: 'content: {{content}}',
             play_title: 'title: {{title}}',
-            resume_playing: 'resume playing: {{title}}'
+            resume_playing: 'resume playing: {{title}}',
+            start_of_list: 'this is no conetnt before this one',
+            end_of_list: 'there is no content for reading'
         },
         sentence_separator: '.'
     },

@@ -2,6 +2,7 @@ import { createActionMap } from './utils';
 
 const actionList = [
     'SET_STATE',
+    'SET_PLAYED',
     'SET_PLAYINGITEM',
     'SET_PLAYINGINDEX',
     'SET_UTTERANCEID'
@@ -13,5 +14,6 @@ export const PLAYER_STATES = createActionMap(stateList, 'tts_player.state');
 
 export const ERROR_CODES = {
     WRONG_INDEX: 1001,
-    STATE_MISMATCHED: 1002
+    STATE_MISMATCHED: 1002,
+    UNKNOWN_CONTENT: 1003
 };

@@ -2,6 +2,7 @@ import { createActionMap } from './utils';
 
 const actionList = [
     'ADD_CONTENT_LIST',
+    'SET_CONTENT_PLAYED',
     'SET_CONTENT_TEXT',
     'SET_DOWNLOADER_STATE'
 ];

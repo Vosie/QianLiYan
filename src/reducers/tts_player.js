@@ -12,6 +12,14 @@ const initState = {
 };
 
 const setPlayingItem = (state, payload) => {
+    if (null === payload) {
+        return {
+            ...state,
+            playingItem: null,
+            playingList: [],
+            playingIndex: -1
+        };
+    }
     const separator = i18n.t('tts_player.sentence_separator');
     // split by separator
     // We need to think if we should put the separator back because it may
