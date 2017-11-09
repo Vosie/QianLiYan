@@ -19,7 +19,7 @@ const singleton = new BaseDownloader(new ContentRunner());
 
 // We should use throttling to prevent overwhelming requesting.
 singleton.throttle = () => {
-    return Math.random() * 5000 + 1000;
+    return Math.random() * 1000;
 };
 
 export default singleton;

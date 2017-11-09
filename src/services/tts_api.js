@@ -1,8 +1,12 @@
 import TTS from 'react-native-tts';
+import EventEmitter from 'browser-event-emitter';
 
-class TTSApi {
+// TODO, try to implement the playing queue here.
+
+class TTSApi extends EventEmitter {
 
     constructor() {
+        this.handleTTSStarted = ::this.handleTTSStarted;
         this.handleTTSCancelled = ::this.handleTTSCancelled;
         this.handleTTSStopped = ::this.handleTTSStopped;
         this._playMap = {};
@@ -10,13 +14,23 @@ class TTSApi {
     }
 
     initEventListeners() {
+        TTS.addEventListener('tts-start', this.handleTTSStarted);
         TTS.addEventListener('tts-cancel', this.handleTTSCancelled);
         TTS.addEventListener('tts-finish', this.handleTTSStopped);
     }
 
     uninitEventListeners() {
+        TTS.removeEventListener('tts-start', this.handleTTSStarted);
         TTS.removeEventListener('tts-cancel', this.handleTTSCancelled);
         TTS.removeEventListener('tts-finish', this.handleTTSStopped);
+    }
+
+    handleTTSStarted({ utteranceId }) {
+        if (!this._playMap[utteranceId]) {
+            return;
+        }
+        const { id, text } = this._playMap[utteranceId];
+        this.emit('start', text, id);
     }
 
     handleTTSCancelled({ utteranceId }) {
@@ -31,6 +45,7 @@ class TTSApi {
 
         reject(text, id);
         delete this._playMap[utteranceId];
+        this.emit('cancelled', text, id);
     }
 
     handleTTSStopped({ utteranceId }) {
@@ -45,6 +60,7 @@ class TTSApi {
 
         resolve(text, id);
         delete this._playMap[utteranceId];
+        this.emit('stopped', text, id);
     }
 
     // id is an optional argument.
@@ -59,6 +75,7 @@ class TTSApi {
                 };
             }).catch((ex) => {
                 reject(ex);
+                this.emit('error', ex);
             });
         });
     }

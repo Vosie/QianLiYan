@@ -76,7 +76,6 @@ export const autoPlay = () => (dispatch, getState) => {
 
 export const play = (item) => (dispatch, getState) => {
     const playerState = getState().ttsPlayer.state;
-    // current playing item had been removed. We just play next playable.
     if (playerState === PLAYER_STATES.PLAYING) {
         return dispatch(stop()).then(() => {
             return dispatch(playItem(item));
