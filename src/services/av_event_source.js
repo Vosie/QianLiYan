@@ -1,10 +1,11 @@
 import MusicControl from 'react-native-music-control';
 import _ from 'lodash';
-import EventEmitter from 'browser-event-emitter';
+import EventEmitter from 'wolfy87-eventemitter';
 
 class MusicEventSource extends EventEmitter {
 
     constructor() {
+        super();
         this.initMusicControl();
     }
 

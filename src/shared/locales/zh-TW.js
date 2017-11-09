@@ -8,7 +8,8 @@ export default {
             play_title: '標題：{{title}}',
             resume_playing: '回復播放：{{title}}',
             start_of_list: '這已經是第一篇文章，無法再往前',
-            end_of_list: '無內容可報讀了'
+            end_of_list: '無內容可報讀了',
+            no_playable: '目前沒有可播放的內容'
         },
         sentence_separator: '。'
     },

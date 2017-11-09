@@ -1,15 +1,19 @@
 import TTS from 'react-native-tts';
-import EventEmitter from 'browser-event-emitter';
+import EventEmitter from 'wolfy87-eventemitter';
+import _ from 'lodash';
 
-// TODO, try to implement the playing queue here.
+const MAXIMUM_PLAYING_IN_TTS = 10;
 
 class TTSApi extends EventEmitter {
 
     constructor() {
+        super();
         this.handleTTSStarted = ::this.handleTTSStarted;
         this.handleTTSCancelled = ::this.handleTTSCancelled;
         this.handleTTSStopped = ::this.handleTTSStopped;
         this._playMap = {};
+        this._playingCount = 0;
+        this._taskQueue = [];
         this.initEventListeners();
     }
 
@@ -43,9 +47,11 @@ class TTSApi extends EventEmitter {
             text
         } = this._playMap[utteranceId];
 
-        reject(text, id);
+        reject(text, id, 'cancelled');
         delete this._playMap[utteranceId];
         this.emit('cancelled', text, id);
+        this._playingCount--;
+        this.nextTask();
     }
 
     handleTTSStopped({ utteranceId }) {
@@ -61,11 +67,29 @@ class TTSApi extends EventEmitter {
         resolve(text, id);
         delete this._playMap[utteranceId];
         this.emit('stopped', text, id);
+        this._playingCount--;
+        this.nextTask();
     }
 
-    // id is an optional argument.
-    play(text, id) {
-        return new Promise((resolve, reject) => {
+    nextTask() {
+        const task = this._taskQueue.shift();
+        if (!task) {
+            return;
+        }
+
+        this._ttsSpeak(task.text, task.id, task.resolve, task.reject);
+    }
+
+    clearQueue() {
+        _.forEach(this._taskQueue, (task) => {
+            task.reject(task.text, task.id, 'cancelled');
+        });
+        this._taskQueue = [];
+    }
+
+    _ttsSpeak(text, id, resolve, reject) {
+        this._playingCount++;
+        try {
             TTS.speak(text).then((utteranceId) => {
                 this._playMap[utteranceId] = {
                     id,
@@ -77,6 +101,20 @@ class TTSApi extends EventEmitter {
                 reject(ex);
                 this.emit('error', ex);
             });
+        } catch (ex) {
+            reject(ex);
+            this.emit('error', ex);
+        }
+    }
+
+    // id is an optional argument.
+    play(text, id) {
+        return new Promise((resolve, reject) => {
+            if (this._playingCount >= MAXIMUM_PLAYING_IN_TTS) {
+                this._taskQueue.push({ text, id, resolve, reject });
+            } else {
+                this._ttsSpeak(text, id, resolve, reject);
+            }
         });
     }
 
@@ -85,6 +123,7 @@ class TTSApi extends EventEmitter {
     }
 
     close() {
+        this.clearQueue();
         this.stop();
         this.uninitEventListeners();
     }

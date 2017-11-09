@@ -13,69 +13,14 @@ import { setContentPlayed } from './content_list';
 
 const setState = createAction(ACTION_TYPES.SET_STATE);
 const setPlayingItem = createAction(ACTION_TYPES.SET_PLAYINGITEM);
-const setUtteranceId = createAction(ACTION_TYPES.SET_UTTERANCEID);
-const setPlayingIndex = createAction(ACTION_TYPES.SET_PLAYINGINDEX);
+const setPlayingSentenceIndex = createAction(ACTION_TYPES.SET_PLAYING_SENTENCE_INDEX);
 
-const playIndex = (index) => (dispatch, getState) => {
-    const { playingList, playingItem } = getState().ttsPlayer;
-    if (index < 0 || index >= playingList.length) {
-        return Promise.reject(new PlayerError(ERROR_CODES.WRONG_INDEX));
-    }
-    // update the notification
-    NotificationHelper.updatePlayback(playingItem, playingList, index);
-    dispatch(setPlayingIndex(index));
-    // We need to think if we should put the separator back because it may
-    // affect the reading speed.
-    return TTSApi.play(playingList[index]);
-};
-
-const readToEnd = (item, dispatch, getState) => {
-    return dispatch(playNextIndex()).then(() => {
-        const {
-            state,
-            playingItem
-        } = getState().ttsPlayer;
-
-        if (state !== PLAYER_STATES.PLAYING) {
-            throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
-        } else if (!playingItem || playingItem.key !== item.key) {
-            throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
-        }
-        return readToEnd(item, dispatch, getState);
-    }).catch((ex) => {
-        if (ex.code === ERROR_CODES.WRONG_INDEX) {
-            // it plays to end. we should capture this error.
-            dispatch(setContentPlayed(getState().ttsPlayer.playingItem));
-            return null;
-        } else {
-            throw ex;
-        }
-    });
-};
-
-const findPlayable = (items) => {
-    return _.find(items, (item) => {
-        return !item.played && item.text;
-    });
-};
-
-export const autoPlay = () => (dispatch, getState) => {
-    const items = getState().contentList.list;
-    const playable = findPlayable(items);
-
-    if (!playable) {
-        return Promise.resolve();
-    }
-
-    return dispatch(play(playable)).then(() => {
-        return dispatch(autoPlay());
-    }).catch((ex) => {
-        console.log('something wrong while autoplaying', ex);
-    });
-};
+// TODO update playingSentenceIndex with TTSApi listener
+// TODO update playing state: pause, stop, resume, etc with TTSApi listener
 
 export const play = (item) => (dispatch, getState) => {
     const playerState = getState().ttsPlayer.state;
+    // If the state is playing, we should stop it gracefully and then play.
     if (playerState === PLAYER_STATES.PLAYING) {
         return dispatch(stop()).then(() => {
             return dispatch(playItem(item));
@@ -86,70 +31,77 @@ export const play = (item) => (dispatch, getState) => {
 };
 
 const playItem = (item) => (dispatch, getState) => {
+    if (!item) {
+        console.warn('no one can be played');
+        return TTSApi.play(i18n.t('tts_player.tts.no_playable')).then(() => {
+            throw new PlayerError(ERROR_CODES.UNKNOWN_CONTENT);
+        });
+    }
     const contentList = getState().contentList.list;
-    const itemForPlay = item || findPlayable(contentList);
-    const itemIndex = _.findIndex(contentList, ['key', itemForPlay.key]);
+    const itemIndex = _.findIndex(contentList, ['key', item.key]);
     // check if it is in the list
     if (itemIndex < 0) {
         console.warn('the item had been removed from list', item);
         return Promise.reject(new PlayerError(ERROR_CODES.UNKNOWN_CONTENT));
     }
+    const separator = i18n.t('tts_player.sentence_separator');
+    // split by separator
+    // We need to think if we should put the separator back because it may
+    // affect the reading speed.
+    const sentences = item.text.split(separator);
     // update states
     dispatch(setState(PLAYER_STATES.PLAYING));
-    dispatch(setPlayingItem(itemForPlay));
-    dispatch(setPlayingIndex(-1));
+    dispatch(setPlayingItem({ item: item, sentences, itemIndex }));
     // update notification
-    NotificationHelper.setPlaying(itemForPlay, itemIndex, contentList.length);
+    NotificationHelper.setPlaying(item, itemIndex, contentList.length);
     // start to play
-    const titleText = i18n.t('tts_player.tts.play_title', { title: itemForPlay.title });
-    return TTSApi.play(titleText).then(() => {
-        if (getState().ttsPlayer.state !== PLAYER_STATES.PLAYING) {
-            throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
+    const titleText = i18n.t('tts_player.tts.play_title', { title: item.title });
+    const contentLabel = i18n.t('tts_player.tts.play_content', {content: ''});
+    TTSApi.play(titleText, { key: item.key, sentenceIndex: 'title' });
+    TTSApi.play(contentLabel, { key: item.key, sentenceIndex: 'content' });
+    dispatch(playSentences(sentences, item.key, 0));
+};
+
+const playSentences = (sentences, key, startIndex) => (dispatch, getState) => {
+    let lastPromise;
+    for (let i = startIndex; i < sentences.length; i++) {
+        const ttsID = { key, sentenceIndex: i };
+        lastPromise = TTSApi.play(sentences[i], ttsID);
+    }
+
+    // We only handle the lastPromise that means we may lost when tts_player doesn't notified us at
+    // any exception or unexpected situation.
+    lastPromise.then(() => {
+        const contentList = getState().contentList.list;
+        const itemIndex = _.findIndex(contentList, ['key', key]);
+        if (contentList[itemIndex + 1]) {
+            return dispatch(playItem(contentList[itemIndex + 1]));
+        } else {
+            return TTSApi.play(i18n.t('tts_player.tts.end_of_list'));
         }
-
-        return TTSApi.play(i18n.t('tts_player.tts.play_content', {content: ''})).then(() => {
-            if (getState().ttsPlayer.state !== PLAYER_STATES.PLAYING) {
-                throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
-            }
-            return readToEnd(itemForPlay, dispatch, getState);
-        });
     }).catch((ex) => {
-        // DO NOT consume the STATE_MISMATCHED because auto play need it to know if someone
-        // interrupt the playing.
-        throw ex;
+        if (ex === 'cancelled') {
+            return 'cancelled';
+        } else {
+            throw ex;
+        }
     });
-};
-
-export const playNextIndex = () => (dispatch, getState) => {
-    const { playingIndex } = getState().ttsPlayer;
-    return dispatch(playIndex(playingIndex + 1));
-};
-
-export const playPreviousIndex = () => (dispatch, getState) => {
-    const { playingIndex } = getState().ttsPlayer;
-    return dispatch(playIndex(playingIndex - 1));
+    // We just give
+    return lastPromise;
 };
 
 export const resume = () => (dispatch, getState) => {
-    const { playingIndex, playingItem } = getState().ttsPlayer;
+    const {
+        playingItem,
+        playingSentenceIndex,
+        playingSentenceList
+    } = getState().ttsPlayer;
 
     dispatch(setState(PLAYER_STATES.PLAYING));
     const hintText = i18n.t('tts_player.tts.resume_playing', { title: playingItem.title });
+    TTSApi.play(hintText);
 
-    return TTSApi.play(hintText).then(() => {
-        if (getState().ttsPlayer.state !== PLAYER_STATES.PLAYING) {
-            throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
-        }
-        // resume playing at the start of paused index.
-        return playIndex(playingIndex).then(() => {
-            if (getState().ttsPlayer.state !== PLAYER_STATES.PLAYING) {
-                throw new PlayerError(ERROR_CODES.STATE_MISMATCHED);
-            }
-            return readToEnd(playingItem, dispatch, getState);
-        });
-    }).catch((ex) => {
-        throw ex;
-    });
+    return dispatch(playSentences(playingSentenceList, playingItem.key, playingSentenceIndex));
 };
 
 export const pause = () => (dispatch, getState) => {
@@ -165,6 +117,7 @@ export const pause = () => (dispatch, getState) => {
 export const stop = () => (dispatch, getState) => {
     // reset the playing item and index when it is stopped.
     dispatch(setState(PLAYER_STATES.STOPPING));
+    TTSApi.clearQueue();
     return TTSApi.stop().then((res) => {
         dispatch(setState(PLAYER_STATES.STOPPED));
         dispatch(setPlayingItem(null));
@@ -179,16 +132,17 @@ export const stop = () => (dispatch, getState) => {
 export const playNextItem = () => (dispatch, getState) => {
     const contentList = getState().contentList.list;
     const playingItem = getState().ttsPlayer.playingItem;
-    const itemIndex = _.findIndex(contentList, ['key', playingItem.key]);
-    if (itemIndex < 0) {
-        // current playing item had been removed. We just play next playable.
-        dispatch(play());
+    const itemIndex = playingItem ? _.findIndex(contentList, ['key', playingItem.key]) : -1;
+    if (itemIndex < 0 && contentList[0]) {
+        return dispatch(play(contentList[0]));
+    } else if (itemIndex < 0 && !contentList[0]) {
+        return TTSApi.play(i18n.t('tts_player.tts.no_playable'));
     } else if (itemIndex === contentList.length - 1) {
         // the current index is the last one. We don't have others.
-        TTSApi.play(i18n.t('tts_player.tts.end_of_list'));
+        return dispatch(play(contentList[0]));;
     } else {
         // the current index can move next.
-        dispatch(play(contentList[itemIndex + 1])).catch((ex) => {
+        return dispatch(play(contentList[itemIndex + 1])).catch((ex) => {
             // consume errors
             console.log('play next item error', ex);
         });
@@ -198,12 +152,14 @@ export const playNextItem = () => (dispatch, getState) => {
 export const playPreviousItem = () => (dispatch, getState) => {
     const contentList = getState().contentList.list;
     const playingItem = getState().ttsPlayer.playingItem;
-    const itemIndex = _.findIndex(contentList, ['key', playingItem.key]);
-    if (itemIndex < 0) {
-        return dispatch(play());
+    const itemIndex = playingItem ? _.findIndex(contentList, ['key', playingItem.key]) : -1;
+    if (itemIndex < 0 && contentList[0]) {
+        return dispatch(play(contentList[0]));
+    } else if (itemIndex < 0 && !contentList[0]) {
+        return TTSApi.play(i18n.t('tts_player.tts.no_playable'));
     } else if (itemIndex === 0) {
         // the current index is the first one. We cannot move to previous one.
-        TTSApi.play(i18n.t('tts_player.tts.start_of_list'));
+        return dispatch(play(contentList[contentList.length]));
     } else {
         // the current index can move next.
         return dispatch(play(contentList[itemIndex - 1])).catch((ex) => {

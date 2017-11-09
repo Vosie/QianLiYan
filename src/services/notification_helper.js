@@ -22,7 +22,7 @@ class NotificationHelper {
 
         MusicControl.updatePlayback({
             state: MusicControl.STATE_PLAYING,
-            elapsedTime: (1 + item.title.length + item.text.length) / 7,
+            elapsedTime: textCount / 7,
         });
     }
 
