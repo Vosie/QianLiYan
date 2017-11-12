@@ -15,9 +15,6 @@ const setState = createAction(ACTION_TYPES.SET_STATE);
 const setPlayingItem = createAction(ACTION_TYPES.SET_PLAYINGITEM);
 const setPlayingSentenceIndex = createAction(ACTION_TYPES.SET_PLAYING_SENTENCE_INDEX);
 
-// TODO update playingSentenceIndex with TTSApi listener
-// TODO update playing state: pause, stop, resume, etc with TTSApi listener
-
 export const initTTSApiListeners = () => (dispatch, getState) => {
     TTSApi.on('start', (text, id) => {
         if (!id) {
