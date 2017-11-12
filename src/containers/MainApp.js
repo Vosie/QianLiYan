@@ -3,7 +3,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { connect } from 'react-redux';
 import RNExitApp from 'react-native-exit-app';
 import { fetchList } from '../actions/content_list';
-import { play } from '../actions/tts_player';
+import { initTTSApiListeners, play } from '../actions/tts_player';
 import ContentList from '../components/ContentList';
 import TTSPlayer from '../components/TTSPlayer';
 import TTSApi from '../services/tts_api';
@@ -31,12 +31,14 @@ class AppContainer extends PureComponent {
         const {
             canPlay,
             contentList,
+            initTTSApiListeners,
             play
         } = this.props;
 
         if (!prevProps.canPlay && canPlay && !this.autoPlayTriggered) {
             this.autoPlayTriggered = true;
             // once canPlay is true, we always have one playable content.
+            initTTSApiListeners();
             play(contentList[0]);
         }
     }
@@ -72,6 +74,7 @@ const mapStateToProps = (state) => {
 
 const mapActionsToProps = {
     fetchList,
+    initTTSApiListeners,
     play
 };
 

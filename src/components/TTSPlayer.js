@@ -40,6 +40,7 @@ class TTSPlayer extends PureComponent {
 
     handlePlay() {
         const {
+            contentList,
             play,
             playerState,
             resume
@@ -47,7 +48,7 @@ class TTSPlayer extends PureComponent {
         if (playerState === PLAYER_STATES.PAUSED) {
             resume();
         } else {
-            play();
+            play(contentList[0]);
         }
     }
 
@@ -62,6 +63,7 @@ class TTSPlayer extends PureComponent {
 
 const mapStateToProps = (state) => {
     return {
+        contentList: state.contentList.list,
         playingItem: state.ttsPlayer.playingItem,
         playerState: state.ttsPlayer.state
     };

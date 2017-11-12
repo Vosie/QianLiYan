@@ -18,6 +18,26 @@ const setPlayingSentenceIndex = createAction(ACTION_TYPES.SET_PLAYING_SENTENCE_I
 // TODO update playingSentenceIndex with TTSApi listener
 // TODO update playing state: pause, stop, resume, etc with TTSApi listener
 
+export const initTTSApiListeners = () => (dispatch, getState) => {
+    TTSApi.on('start', (text, id) => {
+        const {
+            key,
+            sentenceIndex
+        } = id;
+        const {
+            playingItem,
+            playingSentenceList,
+            playingSentenceIndex
+        } = getState().ttsPlayer;
+
+        if (playingItem && playingItem.key === key && playingSentenceIndex !== sentenceIndex) {
+            dispatch(setPlayingSentenceIndex(sentenceIndex));
+            // update playing progress
+            NotificationHelper.updatePlayback(playingItem, playingSentenceList, sentenceIndex);
+        }
+    });
+};
+
 export const play = (item) => (dispatch, getState) => {
     const playerState = getState().ttsPlayer.state;
     // If the state is playing, we should stop it gracefully and then play.
@@ -96,17 +116,26 @@ export const resume = () => (dispatch, getState) => {
         playingSentenceIndex,
         playingSentenceList
     } = getState().ttsPlayer;
+    const { contentList } = getState().contentList.list;
+    const itemIndex = _.findIndex(contentList, ['key', playingItem.key]);
+    // check if it is in the list
+    if (itemIndex < 0) {
+        console.warn('the item had been removed from list', playingItem);
+        return Promise.reject(new PlayerError(ERROR_CODES.UNKNOWN_CONTENT));
+    }
 
     dispatch(setState(PLAYER_STATES.PLAYING));
     const hintText = i18n.t('tts_player.tts.resume_playing', { title: playingItem.title });
     TTSApi.play(hintText);
-
+    // update notification
+    NotificationHelper.setPlaying(playingItem, itemIndex, contentList.length);
     return dispatch(playSentences(playingSentenceList, playingItem.key, playingSentenceIndex));
 };
 
 export const pause = () => (dispatch, getState) => {
     // We only set the state to pausing or paused but not reset others.
     dispatch(setState(PLAYER_STATES.PAUSING));
+    NotificationHelper.pausePlayback();
     return TTSApi.stop().then((res) => {
         dispatch(setState(PLAYER_STATES.PAUSED));
     }).catch((ex) => {
@@ -118,6 +147,7 @@ export const stop = () => (dispatch, getState) => {
     // reset the playing item and index when it is stopped.
     dispatch(setState(PLAYER_STATES.STOPPING));
     TTSApi.clearQueue();
+    NotificationHelper.stopPlayback();
     return TTSApi.stop().then((res) => {
         dispatch(setState(PLAYER_STATES.STOPPED));
         dispatch(setPlayingItem(null));
