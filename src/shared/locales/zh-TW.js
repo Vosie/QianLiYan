@@ -9,9 +9,10 @@ export default {
             resume_playing: '回復播放：{{title}}',
             start_of_list: '這已經是第一篇文章，無法再往前',
             end_of_list: '無內容可報讀了',
-            no_playable: '目前沒有可播放的內容'
+            no_playable: '目前沒有可播放的內容',
+            no_text: '本篇文章尚未被下載及處理完成'
         },
-        sentence_separator: '。'
+        sentence_separator: /(?:，|。|：|！|？)/gi
     },
     errors: {
         1001: '播放器企圖去播放一個不存在的文字。',

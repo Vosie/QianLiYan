@@ -47,7 +47,7 @@ class TTSApi extends EventEmitter {
             text
         } = this._playMap[utteranceId];
 
-        reject(text, id, 'cancelled');
+        reject && reject({ type: 'cancelled', text, id });
         delete this._playMap[utteranceId];
         this.emit('cancelled', text, id);
         this._playingCount--;
@@ -64,7 +64,7 @@ class TTSApi extends EventEmitter {
             text
         } = this._playMap[utteranceId];
 
-        resolve(text, id);
+        resolve && resolve(text, id);
         delete this._playMap[utteranceId];
         this.emit('stopped', text, id);
         this._playingCount--;
@@ -82,7 +82,11 @@ class TTSApi extends EventEmitter {
 
     clearQueue() {
         _.forEach(this._taskQueue, (task) => {
-            task.reject(task.text, task.id, 'cancelled');
+            task.reject && task.reject({
+                type: 'cancelled',
+                text: task.text,
+                id: task.id
+            });
         });
         this._taskQueue = [];
     }
@@ -98,11 +102,11 @@ class TTSApi extends EventEmitter {
                     text
                 };
             }).catch((ex) => {
-                reject(ex);
+                reject && reject(ex);
                 this.emit('error', ex);
             });
         } catch (ex) {
-            reject(ex);
+            reject && reject(ex);
             this.emit('error', ex);
         }
     }
@@ -115,6 +119,26 @@ class TTSApi extends EventEmitter {
             } else {
                 this._ttsSpeak(text, id, resolve, reject);
             }
+        });
+    }
+
+    playList(list, key, sentenceIndexKey) {
+        return new Promise((resolve, reject) => {
+            _.forEach(list, (text, index) => {
+                const id = { key, [sentenceIndexKey]: index };
+                if (this._playingCount >= MAXIMUM_PLAYING_IN_TTS) {
+                    const task = { text, id };
+                    if (index === list.length - 1) {
+                        task.resolve = resolve;
+                        task.reject = reject;
+                    }
+                    this._taskQueue.push(task);
+                } else if (index === list.length - 1) {
+                    this._ttsSpeak(text, id, resolve, reject);
+                } else {
+                    this._ttsSpeak(text, id);
+                }
+            });
         });
     }
 

@@ -11,7 +11,8 @@ export default {
             resume_playing: 'resume playing: {{title}}',
             start_of_list: 'this is no conetnt before this one',
             end_of_list: 'there is no content for reading',
-            no_playable: 'we cannot find any content which can play currently'
+            no_playable: 'we cannot find any content which can play currently',
+            no_text: 'the content of this article isn\'t downloaded'
         },
         sentence_separator: '.'
     },

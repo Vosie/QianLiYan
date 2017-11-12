@@ -4,10 +4,12 @@ import _ from 'lodash';
 class NotificationHelper {
 
     setPlaying(item, index, count) {
+        const stringLength = item.title.length + (item.text ? item.text.length : 0);
         MusicControl.setNowPlaying({
             title: `(${index + 1}/${count}) - ${item.title}`,
             artist: 'TTS',
-            duration: (1 + item.title.length + item.text.length) / 7, // (Seconds)
+            // (Seconds)
+            duration: (1 + stringLength) / 7,
             description: item.description,
             state: MusicControl.STATE_PLAYING,
             speed: 1

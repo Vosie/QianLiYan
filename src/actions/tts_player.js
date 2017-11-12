@@ -20,6 +20,10 @@ const setPlayingSentenceIndex = createAction(ACTION_TYPES.SET_PLAYING_SENTENCE_I
 
 export const initTTSApiListeners = () => (dispatch, getState) => {
     TTSApi.on('start', (text, id) => {
+        if (!id) {
+            // We may not have id if the text is not played from content list.
+            return;
+        }
         const {
             key,
             sentenceIndex
@@ -50,6 +54,14 @@ export const play = (item) => (dispatch, getState) => {
     }
 };
 
+const handlePlayingCancelledReject = (ex) => {
+    if (ex && ex.type === 'cancelled') {
+        return 'cancelled';
+    } else {
+        throw ex;
+    }
+};
+
 const playItem = (item) => (dispatch, getState) => {
     if (!item) {
         console.warn('no one can be played');
@@ -64,6 +76,21 @@ const playItem = (item) => (dispatch, getState) => {
         console.warn('the item had been removed from list', item);
         return Promise.reject(new PlayerError(ERROR_CODES.UNKNOWN_CONTENT));
     }
+    // play title
+    const titleText = i18n.t('tts_player.tts.play_title', { title: item.title });
+    TTSApi.play(titleText, { key: item.key, sentenceIndex: 'title' })
+          .catch(handlePlayingCancelledReject);
+
+    // update notification
+    NotificationHelper.setPlaying(item, itemIndex, contentList.length);
+    // check content
+    if (!item.text) {
+        console.warn('no content for this item', item);
+        return TTSApi.play(i18n.t('tts_player.tts.no_text')).then(() => {
+            throw new PlayerError(ERROR_CODES.UNKNOWN_CONTENT);
+        });
+    }
+    // process content
     const separator = i18n.t('tts_player.sentence_separator');
     // split by separator
     // We need to think if we should put the separator back because it may
@@ -72,22 +99,16 @@ const playItem = (item) => (dispatch, getState) => {
     // update states
     dispatch(setState(PLAYER_STATES.PLAYING));
     dispatch(setPlayingItem({ item: item, sentences, itemIndex }));
-    // update notification
-    NotificationHelper.setPlaying(item, itemIndex, contentList.length);
     // start to play
-    const titleText = i18n.t('tts_player.tts.play_title', { title: item.title });
     const contentLabel = i18n.t('tts_player.tts.play_content', {content: ''});
-    TTSApi.play(titleText, { key: item.key, sentenceIndex: 'title' });
-    TTSApi.play(contentLabel, { key: item.key, sentenceIndex: 'content' });
+    TTSApi.play(contentLabel, { key: item.key, sentenceIndex: 'content' })
+          .catch(handlePlayingCancelledReject);
     dispatch(playSentences(sentences, item.key, 0));
 };
 
 const playSentences = (sentences, key, startIndex) => (dispatch, getState) => {
-    let lastPromise;
-    for (let i = startIndex; i < sentences.length; i++) {
-        const ttsID = { key, sentenceIndex: i };
-        lastPromise = TTSApi.play(sentences[i], ttsID);
-    }
+    // TODO: we don't care startIndex now because we don't have good UX on pause and resume.
+    let lastPromise = TTSApi.playList(sentences, key, 'sentenceIndex');
 
     // We only handle the lastPromise that means we may lost when tts_player doesn't notified us at
     // any exception or unexpected situation.
@@ -99,13 +120,7 @@ const playSentences = (sentences, key, startIndex) => (dispatch, getState) => {
         } else {
             return TTSApi.play(i18n.t('tts_player.tts.end_of_list'));
         }
-    }).catch((ex) => {
-        if (ex === 'cancelled') {
-            return 'cancelled';
-        } else {
-            throw ex;
-        }
-    });
+    }).catch(handlePlayingCancelledReject);
     // We just give
     return lastPromise;
 };
