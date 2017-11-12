@@ -14,7 +14,7 @@ export default {
             no_playable: 'we cannot find any content which can play currently',
             no_text: 'the content of this article isn\'t downloaded'
         },
-        sentence_separator: '.'
+        sentence_separator: /(?:\.|\?|:|,)/gi
     },
     errors: {
         1001: 'Player tries to play inexisting text.',
