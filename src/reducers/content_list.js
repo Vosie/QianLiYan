@@ -23,10 +23,14 @@ const setContentText = (state, payload) => {
     // clone the list to let purecomponent re-render.
     const list = [...state.list];
 
-    const item = _.find(list, ['key', payload.key]);
-    if (item) {
+    const itemIndex = _.findIndex(list, ['key', payload.key]);
+    if (itemIndex > -1) {
+        // clone the item to let purecomponent re-render
+        const item = { ...list[itemIndex] };
         item.text = payload.text;
         item.lang = payload.lang;
+        // swap the cloned item
+        list.splice(itemIndex, 1, item);
     }
 
     let counter = 0;
