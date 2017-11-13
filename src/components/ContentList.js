@@ -27,10 +27,11 @@ class ContentList extends PureComponent {
     }
 
     render() {
-        const { contentList } = this.props;
+        const { contentList, playingItem } = this.props;
         return (
             <FlatList
               data={contentList}
+              extraData={playingItem}
               renderItem={this.renderListItem}
               style={style.list} />
         );
