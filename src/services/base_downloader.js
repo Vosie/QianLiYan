@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import DeviceLocker from 'react-native-device-locker';
 
 class BaseDownloader {
 
@@ -15,6 +16,12 @@ class BaseDownloader {
 
         if (!task) {
             this.running = false;
+            DeviceLocker.releaseWakeLock(this.deviceLock).then(() => {
+                console.log('lock released', this.deviceLock);
+                this.deviceLock = null;
+            }).catch((ex) => {
+                console.error('release lock failed', ex);
+            });
             return;
         }
 
@@ -38,7 +45,14 @@ class BaseDownloader {
         }
 
         this.running = true;
-        this._fetchNext();
+        DeviceLocker.requestWakeLock(DeviceLocker.PARTIAL_WAKE_LOCK).then((id) => {
+            this.deviceLock = id;
+            console.log('request wake lock successfully', id);
+            this._fetchNext();
+        }).catch((ex) => {
+            console.log('request wake lock failed', ex);
+            this._fetchNext();
+        });
     }
 
     download(url) {

@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { connect } from 'react-redux';
 import RNExitApp from 'react-native-exit-app';
+import DeviceLocker from 'react-native-device-locker';
 import { fetchList } from '../actions/content_list';
 import { initTTSApiListeners, play } from '../actions/tts_player';
 import ContentList from '../components/ContentList';
@@ -44,6 +45,7 @@ class AppContainer extends PureComponent {
     }
 
     componentWillUnmount() {
+        DeviceLocker.releaseAll();
         TTSApi.close();
         NotificationHelper.close();
     }

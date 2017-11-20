@@ -148,6 +148,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-device-locker')
     compile project(':react-native-i18n')
     compile project(':react-native-exit-app')
     compile project(':react-native-music-control')

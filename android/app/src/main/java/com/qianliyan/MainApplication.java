@@ -3,6 +3,7 @@ package com.qianliyan;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import org.vosie.reactnative.devicelocker.DeviceLockerPackage;
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
 import com.github.wumke.RNExitApp.RNExitAppPackage;
 import com.tanguyantoine.react.MusicControl;
@@ -27,6 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new DeviceLockerPackage(),
             new RNI18nPackage(),
             new RNExitAppPackage(),
             new MusicControl(),
