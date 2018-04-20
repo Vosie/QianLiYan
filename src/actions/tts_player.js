@@ -100,7 +100,7 @@ const playItem = (item) => (dispatch, getState) => {
     const contentLabel = i18n.t('tts_player.tts.play_content', {content: ''});
     TTSApi.play(contentLabel, { key: item.key, sentenceIndex: 'content' })
           .catch(handlePlayingCancelledReject);
-    dispatch(playSentences(sentences, item.key, 0));
+    return dispatch(playSentences(sentences, item.key, 0));
 };
 
 const playSentences = (sentences, key, startIndex) => (dispatch, getState) => {
@@ -128,7 +128,7 @@ export const resume = () => (dispatch, getState) => {
         playingSentenceIndex,
         playingSentenceList
     } = getState().ttsPlayer;
-    const { contentList } = getState().contentList.list;
+    const contentList = getState().contentList.list;
     const itemIndex = _.findIndex(contentList, ['key', playingItem.key]);
     // check if it is in the list
     if (itemIndex < 0) {
@@ -138,7 +138,8 @@ export const resume = () => (dispatch, getState) => {
 
     dispatch(setState(PLAYER_STATES.PLAYING));
     const hintText = i18n.t('tts_player.tts.resume_playing', { title: playingItem.title });
-    TTSApi.play(hintText);
+    // any exception of system hinting text should be fine and should be caught.
+    TTSApi.play(hintText).catch(handlePlayingCancelledReject);
     // update notification
     NotificationHelper.setPlaying(playingItem, itemIndex, contentList.length);
     return dispatch(playSentences(playingSentenceList, playingItem.key, playingSentenceIndex));
@@ -147,6 +148,8 @@ export const resume = () => (dispatch, getState) => {
 export const pause = () => (dispatch, getState) => {
     // We only set the state to pausing or paused but not reset others.
     dispatch(setState(PLAYER_STATES.PAUSING));
+    // clear the whole queue to stop the reading
+    TTSApi.clearQueue();
     NotificationHelper.pausePlayback();
     return TTSApi.stop().then((res) => {
         dispatch(setState(PLAYER_STATES.PAUSED));
@@ -181,7 +184,7 @@ export const playNextItem = () => (dispatch, getState) => {
         return TTSApi.play(i18n.t('tts_player.tts.no_playable'));
     } else if (itemIndex === contentList.length - 1) {
         // the current index is the last one. We don't have others.
-        return dispatch(play(contentList[0]));;
+        return dispatch(play(contentList[0]));
     } else {
         // the current index can move next.
         return dispatch(play(contentList[itemIndex + 1])).catch((ex) => {

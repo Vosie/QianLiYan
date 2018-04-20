@@ -6,6 +6,7 @@ class MusicEventSource extends EventEmitter {
 
     constructor() {
         super();
+        this.timeoutID = null;
         this.initMusicControl();
     }
 
@@ -30,7 +31,17 @@ class MusicEventSource extends EventEmitter {
         // This happens when headphones are unplugged or a bluetooth audio peripheral disconnects
         // from the device
         MusicControl.on('pause', ()=> {
-            this.emit('pause');
+            // Have no idea to handle pause or playNextItem on a headset with single button pressed.
+            // UX needed...  :'(
+            if (this.timeoutID) {
+                clearTimeout(this.timeoutID);
+                this.timeoutID = null;
+                this.emit('nextTrack');
+            } else {
+                this.timeoutID = setTimeout(() => {
+                    this.emit('pause');
+                }, 500);
+            }
         });
 
         MusicControl.on('stop', ()=> {

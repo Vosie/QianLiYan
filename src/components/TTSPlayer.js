@@ -29,9 +29,7 @@ class TTSPlayer extends PureComponent {
             stop
         } = this.props;
         avEventSource.on('play', this.handlePlay);
-        // Have no idea to handle pause or playNextItem on a headset with single button pressed.
-        // UX needed...  :'(
-        avEventSource.on('pause', playNextItem);
+        avEventSource.on('pause', pause);
         avEventSource.on('stop', stop);
         // TODO: use action from actions/tts_player.js
         avEventSource.on('nextTrack', playNextItem);
