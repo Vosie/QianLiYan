@@ -17,7 +17,6 @@ class BaseDownloader {
         if (!task) {
             this.running = false;
             DeviceLocker.releaseWakeLock(this.deviceLock).then(() => {
-                console.log('lock released', this.deviceLock);
                 this.deviceLock = null;
             }).catch((ex) => {
                 console.error('release lock failed', ex);
@@ -47,7 +46,6 @@ class BaseDownloader {
         this.running = true;
         DeviceLocker.requestWakeLock(DeviceLocker.PARTIAL_WAKE_LOCK).then((id) => {
             this.deviceLock = id;
-            console.log('request wake lock successfully', id);
             this._fetchNext();
         }).catch((ex) => {
             console.log('request wake lock failed', ex);
