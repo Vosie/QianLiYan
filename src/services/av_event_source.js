@@ -39,6 +39,7 @@ class MusicEventSource extends EventEmitter {
                 this.emit('nextTrack');
             } else {
                 this.timeoutID = setTimeout(() => {
+                    this.timeoutID = null;
                     this.emit('pause');
                 }, 500);
             }
