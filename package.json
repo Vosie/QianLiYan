@@ -8,11 +8,12 @@
     "test": "jest"
   },
   "dependencies": {
+    "buffer": "^5.1.0",
+    "cheerio-without-node-native": "^0.20.2",
     "lodash": "^4.17.10",
     "optimist": "^0.6.1",
     "react": "16.4.1",
     "react-native": "^0.56.0",
-    "react-native-cheerio": "^1.0.0-rc.4",
     "react-native-device-locker": "^1.0.2",
     "react-native-exit-app": "^1.0.0",
     "react-native-i18n": "^2.0.15",
