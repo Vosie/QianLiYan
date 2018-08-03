@@ -9,7 +9,7 @@ void function () {
     return strippedInput.split(' ');
   };
 
-  module.exports = function (content, language) {
+  module.exports = stopwords = function (content, language) {
     if (null == language)
       language = 'en';
 
