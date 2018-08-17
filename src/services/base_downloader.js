@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import DeviceLocker from 'react-native-device-locker';
+import BackgroundTimer from 'react-native-background-timer';
 
 class BaseDownloader {
 
@@ -29,12 +30,12 @@ class BaseDownloader {
                 this._runner.process(obj, task);
             } finally {
                 // We have to continue fetch no matter it is failed or not.
-                setTimeout(this._fetchNext, this.throttle ? this.throttle() : 0);
+                BackgroundTimer.setTimeout(this._fetchNext, this.throttle ? this.throttle() : 0);
             }
         }).catch((ex) => {
             task.reject(ex);
             // We have to continue fetch no matter it is failed or not.
-            setTimeout(this._fetchNext, this.throttle ? this.throttle() : 0);
+            BackgroundTimer.setTimeout(this._fetchNext, this.throttle ? this.throttle() : 0);
         });
     }
 

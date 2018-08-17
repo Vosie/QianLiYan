@@ -1,6 +1,7 @@
 import MusicControl from 'react-native-music-control';
 import _ from 'lodash';
 import EventEmitter from 'wolfy87-eventemitter';
+import BackgroundTimer from 'react-native-background-timer';
 
 class MusicEventSource extends EventEmitter {
 
@@ -34,11 +35,11 @@ class MusicEventSource extends EventEmitter {
             // Have no idea to handle pause or playNextItem on a headset with single button pressed.
             // UX needed...  :'(
             if (this.timeoutID) {
-                clearTimeout(this.timeoutID);
+                BackgroundTimer.clearTimeout(this.timeoutID);
                 this.timeoutID = null;
                 this.emit('nextTrack');
             } else {
-                this.timeoutID = setTimeout(() => {
+                this.timeoutID = BackgroundTimer.setTimeout(() => {
                     this.timeoutID = null;
                     this.emit('pause');
                 }, 500);

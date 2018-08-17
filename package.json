@@ -13,6 +13,7 @@
     "optimist": "0.6.1",
     "react": "16.0.0-beta.5",
     "react-native": "0.49.3",
+    "react-native-background-timer": "^2.0.1",
     "react-native-cheerio": "1.0.0-rc.4",
     "react-native-device-locker": "1.0.0",
     "react-native-exit-app": "1.0.0",
