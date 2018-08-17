@@ -92,7 +92,10 @@ const playItem = (item) => (dispatch, getState) => {
     // split by separator
     // We need to think if we should put the separator back because it may
     // affect the reading speed.
-    const sentences = item.text.split(separator);
+    const sentences = _.reduce(item.text.split(separator), (acc, text) => {
+        _.trim(text) && acc.push(text.trim());
+        return acc;
+    }, []);
     // update states
     dispatch(setState(PLAYER_STATES.PLAYING));
     dispatch(setPlayingItem({ item: item, sentences, itemIndex }));

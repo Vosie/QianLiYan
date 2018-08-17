@@ -12,7 +12,7 @@ export default {
             no_playable: '目前沒有可播放的內容',
             no_text: '本篇文章尚未被下載及處理完成'
         },
-        sentence_separator: /(?:，|。|：|！|？)/gi
+        sentence_separator: /(?:，|。|：|！|？|、)/gi
     },
     errors: {
         1001: '播放器企圖去播放一個不存在的文字。',
