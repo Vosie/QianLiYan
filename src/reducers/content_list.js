@@ -9,6 +9,20 @@ const initState = {
     list: []
 };
 
+/* a content item looks like:
+ * {
+ *   key: 'url of rss + url of content',
+ *   text: 'text content',
+ *   link: 'url of content',
+ *   lang: 'language code of content, like zh, en',
+ *   title: 'title of content which is from rss',
+ *   description: '',
+ *   sourceURL: 'url of rss',
+ *   categories: ['category of content which is from rss', '..'],
+ *   played: boolean,
+ *   pubDate: 'published date which is from rss'
+ * }
+ */
 const addContentList = (state, payload) => {
     return {
         ...state,

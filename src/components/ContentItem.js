@@ -10,9 +10,10 @@ class ContentItem extends PureComponent {
             playing
         } = this.props;
         const compStyle = [index % 2 ? style.odd : style.even];
-        if (playing) {
-            compStyle.push(style.playing);
-        }
+
+        playing && compStyle.push(style.playing);
+        !!item.text && compStyle.push(style.downloaded);
+
         return (<Text key={item.link} style={compStyle}>{item.title}</Text>);
     }
 }
