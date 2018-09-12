@@ -1,15 +1,24 @@
 import React, { PureComponent } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import {
+    Container,
+    Content,
+    Spinner
+} from 'native-base';
 import { connect } from 'react-redux';
 import RNExitApp from 'react-native-exit-app';
 import DeviceLocker from 'react-native-device-locker';
 import { fetchList } from '../actions/content_list';
-import { initTTSApiListeners, play } from '../actions/tts_player';
+import {
+    initTTSApiListeners,
+    play,
+    pause,
+    resume
+} from '../actions/tts_player';
 import ContentList from '../components/ContentList';
 import TTSPlayer from '../components/TTSPlayer';
 import TTSApi from '../services/tts_api';
 import NotificationHelper from '../services/notification_helper';
-import style from './styles/main_app';
+import AppHeader from './AppHeader';
 
 class AppContainer extends PureComponent {
 
@@ -50,34 +59,51 @@ class AppContainer extends PureComponent {
         NotificationHelper.close();
     }
 
-    render() {
-        const { canPlay, store } = this.props;
-        if (!canPlay) {
-            return (
-                <ActivityIndicator animating={true} size='large' style={style.loading} />
-            );
-        } else {
-            return (
-                <View style={style.main}>
-                    <ContentList />
+    renderLoading() {
+        return (
+            <Container>
+                <Content>
+                    <Spinner />
+                </Content>
+            </Container>
+        );
+    }
+
+    renderMain() {
+        const { play, pause, resume } = this.props;
+        return (
+            <Container>
+                <AppHeader title='All Items'/>
+                <Content>
+                    <ContentList
+                        onPlay={play}
+                        onPause={pause}
+                        onResume={resume} />
                     <TTSPlayer />
-                </View>
-            );
-        }
+                </Content>
+            </Container>
+        );
+    }
+
+    render() {
+        return this.props.canPlay ? this.renderMain() : this.renderLoading();
     }
 }
 
 const mapStateToProps = (state) => {
     return {
         canPlay: state.contentList.canPlay,
-        contentList: state.contentList.list
+        contentList: state.contentList.list,
+        playingItem: state.ttsPlayer.playingItem
     };
 };
 
 const mapActionsToProps = {
     fetchList,
     initTTSApiListeners,
-    play
+    play,
+    pause,
+    resume
 };
 
 export default connect(mapStateToProps, mapActionsToProps)(AppContainer);
