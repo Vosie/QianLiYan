@@ -8,6 +8,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "babel-preset-react-native-stage-0": "^1.0.1",
     "browser-event-emitter": "1.0.2",
     "lodash": "^4.17.5",
     "native-base": "2.6.1",
