@@ -2,7 +2,9 @@ import React, { PureComponent } from 'react';
 import {
     Container,
     Content,
-    Spinner
+    Spinner,
+    Footer,
+    FooterTab
 } from 'native-base';
 import { connect } from 'react-redux';
 import RNExitApp from 'react-native-exit-app';
@@ -79,8 +81,12 @@ class AppContainer extends PureComponent {
                         onPlay={play}
                         onPause={pause}
                         onResume={resume} />
-                    <TTSPlayer />
                 </Content>
+                <Footer>
+                    <FooterTab>
+                        <TTSPlayer />
+                    </FooterTab>
+                </Footer>
             </Container>
         );
     }

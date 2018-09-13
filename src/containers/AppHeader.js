@@ -6,6 +6,7 @@ import {
     Header,
     Icon,
     Left,
+    Right,
     Title
 } from 'native-base';
 
@@ -29,6 +30,7 @@ class AppHeader extends PureComponent {
                 <Body>
                     <Title>{title}</Title>
                 </Body>
+                <Right/>
             </Header>
         );
     }
