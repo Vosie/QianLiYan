@@ -2,10 +2,11 @@ import React, { PureComponent } from 'react';
 import {
     Container,
     Content,
-    Spinner,
     Footer,
-    FooterTab
+    FooterTab,
+    Spinner
 } from 'native-base';
+import Drawer from 'react-native-drawer';
 import { connect } from 'react-redux';
 import RNExitApp from 'react-native-exit-app';
 import DeviceLocker from 'react-native-device-locker';
@@ -21,6 +22,7 @@ import TTSPlayer from '../components/TTSPlayer';
 import TTSApi from '../services/tts_api';
 import NotificationHelper from '../services/notification_helper';
 import AppHeader from './AppHeader';
+import SideBar from './SideBar';
 
 class AppContainer extends PureComponent {
 
@@ -61,7 +63,23 @@ class AppContainer extends PureComponent {
         NotificationHelper.close();
     }
 
-    renderLoading() {
+    bindDrawer = (drawer) => {
+        this.drawer = drawer;
+    }
+
+    closeDrawer = () => {
+        this.drawer && this.drawer.close();
+    }
+
+    openDrawer = () => {
+        this.drawer && this.drawer.open();
+    }
+
+    renderDrawer = () => {
+        return (<SideBar />);
+    }
+
+    renderLoading = () => {
         return (
             <Container>
                 <Content>
@@ -71,27 +89,43 @@ class AppContainer extends PureComponent {
         );
     }
 
-    renderMain() {
+    renderMain = () => {
         const { play, pause, resume } = this.props;
+        const drawerStyles = {
+            drawer: { shadowColor: '#000000', shadowOpacity: 0.8, shadowRadius: 3},
+            main: {paddingLeft: 3}
+        };
         return (
-            <Container>
-                <AppHeader title='All Items'/>
-                <Content>
-                    <ContentList
-                        onPlay={play}
-                        onPause={pause}
-                        onResume={resume} />
-                </Content>
-                <Footer>
-                    <FooterTab>
-                        <TTSPlayer />
-                    </FooterTab>
-                </Footer>
-            </Container>
+            <Drawer
+                ref={this.bindDrawer}
+                closedDrawerOffset={-3}
+                content={this.renderDrawer()}
+                openDrawerOffset={0.3}
+                panCloseMask={0.2}
+                style={drawerStyles}
+                tapToClose={true}
+                type='overlay'
+                tweenHandler={(ratio) => ({ main: { opacity: (2 - ratio) / 2 } })}
+                onClose={this.closeDrawer}>
+                <Container>
+                    <AppHeader title='All Items' onMenuClick={this.openDrawer}/>
+                    <Content>
+                        <ContentList
+                            onPlay={play}
+                            onPause={pause}
+                            onResume={resume} />
+                    </Content>
+                    <Footer>
+                        <FooterTab>
+                            <TTSPlayer />
+                        </FooterTab>
+                    </Footer>
+                </Container>
+            </Drawer>
         );
     }
 
-    render() {
+    render = () => {
         return this.props.canPlay ? this.renderMain() : this.renderLoading();
     }
 }

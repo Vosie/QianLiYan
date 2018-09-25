@@ -23,7 +23,7 @@ class AppHeader extends PureComponent {
         return (
             <Header>
                 <Left>
-                    <Button transparent onClick={onMenuClick}>
+                    <Button transparent onPress={onMenuClick}>
                         <Icon name="menu" />
                     </Button>
                 </Left>

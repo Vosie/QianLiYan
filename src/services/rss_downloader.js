@@ -44,4 +44,9 @@ class RSSRunner {
 
 const singleton = new BaseDownloader(new RSSRunner());
 
+// We should use throttling to prevent overwhelming requesting.
+singleton.throttle = () => {
+    return Math.random() * 2000 + 1000;
+};
+
 export default singleton;
