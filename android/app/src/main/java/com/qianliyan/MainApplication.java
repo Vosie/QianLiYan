@@ -3,12 +3,12 @@ package com.qianliyan;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.ocetnik.timer.BackgroundTimerPackage;
-import org.vosie.reactnative.devicelocker.DeviceLockerPackage;
+import net.no_mad.tts.TextToSpeechPackage;
+import com.tanguyantoine.react.MusicControl;
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
 import com.github.wumke.RNExitApp.RNExitAppPackage;
-import com.tanguyantoine.react.MusicControl;
-import net.no_mad.tts.TextToSpeechPackage;
+import org.vosie.reactnative.devicelocker.DeviceLockerPackage;
+import com.ocetnik.timer.BackgroundTimerPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -29,12 +29,12 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new BackgroundTimerPackage(),
-            new DeviceLockerPackage(),
+            new TextToSpeechPackage(),
+            new MusicControl(),
             new RNI18nPackage(),
             new RNExitAppPackage(),
-            new MusicControl(),
-          new TextToSpeechPackage()
+            new DeviceLockerPackage(),
+            new BackgroundTimerPackage()
       );
     }
 
