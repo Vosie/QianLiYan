@@ -77,10 +77,10 @@ class AppContainer extends PureComponent {
             <Container>
                 <AppHeader title='All Items'/>
                 <Content>
-                    <ContentList
+                    {/* <ContentList
                         onPlay={play}
                         onPause={pause}
-                        onResume={resume} />
+                        onResume={resume} /> */}
                 </Content>
                 <Footer>
                     <FooterTab>
