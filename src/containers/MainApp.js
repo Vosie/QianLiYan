@@ -10,6 +10,7 @@ import Drawer from 'react-native-drawer';
 import { connect } from 'react-redux';
 import RNExitApp from 'react-native-exit-app';
 import DeviceLocker from 'react-native-device-locker';
+import i18n from '../shared/i18n';
 import { fetchList } from '../actions/content_list';
 import {
     initTTSApiListeners,
@@ -22,7 +23,7 @@ import TTSPlayer from '../components/TTSPlayer';
 import TTSApi from '../services/tts_api';
 import NotificationHelper from '../services/notification_helper';
 import AppHeader from './AppHeader';
-import SideBar from './SideBar';
+import SideBar, { OPTION_TYPES } from './SideBar';
 
 class AppContainer extends PureComponent {
 
@@ -76,7 +77,8 @@ class AppContainer extends PureComponent {
     }
 
     renderDrawer = () => {
-        return (<SideBar />);
+        // TODO: read url from active playing group
+        return (<SideBar active={OPTION_TYPES.ALL} />);
     }
 
     renderLoading = () => {
@@ -87,6 +89,11 @@ class AppContainer extends PureComponent {
                 </Content>
             </Container>
         );
+    }
+
+    renderTitle = () => {
+        // TODO: read title from active playing group
+        return i18n.t('app.all_items');
     }
 
     renderMain = () => {
@@ -108,7 +115,7 @@ class AppContainer extends PureComponent {
                 tweenHandler={(ratio) => ({ main: { opacity: (2 - ratio) / 2 } })}
                 onClose={this.closeDrawer}>
                 <Container>
-                    <AppHeader title='All Items' onMenuClick={this.openDrawer}/>
+                    <AppHeader title={this.renderTitle()} onMenuClick={this.openDrawer}/>
                     <Content>
                         <ContentList
                             onPlay={play}

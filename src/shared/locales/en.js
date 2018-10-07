@@ -1,4 +1,10 @@
 export default {
+    app: {
+        add_rss: 'Add RSS Feed',
+        all_items: 'All RSS News',
+        app_name: 'Qian Li Yan',
+        rss_list: 'RSS List'
+    },
     rss: {
         item_text_separator: ', '
     },

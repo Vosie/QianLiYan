@@ -1,4 +1,10 @@
 export default {
+    app: {
+        add_rss: '新增 RSS 內容',
+        all_items: '所有 RSS 內容',
+        app_name: '千里眼',
+        rss_list: 'RSS 清單'
+    },
     rss: {
         item_text_separator: '，'
     },
