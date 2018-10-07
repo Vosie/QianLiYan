@@ -15,6 +15,9 @@ import { FlatList } from 'react-native';
 import _ from 'lodash';
 import { FEED_TYPE } from '../constants/content_list';
 import i18n from '../shared/i18n';
+import style from './styles/side_bar';
+import AddRSSMenu from './AddRSSMenu';
+import AllRSSMenu from './AllRSSMenu';
 
 export const OPTION_TYPES = {
     ADD: 'add_button',
@@ -43,48 +46,43 @@ class SideBar extends PureComponent {
 
     renderListItem = ({ item }) => {
         const { active, onPress } = this.props;
-        const name = item.type === OPTION_TYPES.ALL ? i18n.t('app.all_items')
-                                                    : item.name;
-        const iconStyle = {
-            fontSize: 18
-        };
-        return item.type === OPTION_TYPES.ADD ? (
-            <ListItem key={item.url} button onPress={onPress}>
-                <Body>
-                    <Text>
-                        <Icon type='Ionicons' name='md-add' style={iconStyle} />
-                        {' '}
-                        {i18n.t('app.add_rss')}
-                    </Text>
-                </Body>
-            </ListItem>
-        ) : (
-            <ListItem
-                key={item.url}
-                button
-                selected={item.url === active}
-                onPress={onPress} >
-                <Body>
-                    <Text>{name}</Text>
-                </Body>
-            </ListItem>
-        );
+        switch (item.type) {
+            case OPTION_TYPES.ADD:
+                return (<AddRSSMenu onPress={onPress} />);
+            case OPTION_TYPES.ALL:
+                return (<AllRSSMenu active={active === OPTION_TYPES.ALL} onPress={onPress} />);
+            default:
+                return (
+                    <ListItem
+                        key={item.url}
+                        button
+                        selected={item.url === active}
+                        onPress={onPress} >
+                        <Left style={style.itemRight} />
+                        <Body>
+                            <Text>{item.name}</Text>
+                        </Body>
+                        <Right style={style.itemRight}>
+                            <Icon
+                                type='MaterialCommunityIcons'
+                                name='delete-sweep'
+                                style={style.itemIcon} />
+                        </Right>
+                    </ListItem>
+                );
+        }
     }
 
     render() {
-        const style = { backgroundColor: 'white' };
-        const iconStyle = {
-            color: 'white'
-        };
         return (
-            <Container style={style}>
+            <Container style={style.sideBar}>
                 <Header>
                     <Left/>
                     <Body>
                         <Title>{i18n.t('app.app_name')}</Title>
                     </Body>
                     <Right>
-                        <Icon type='Ionicons' name='md-settings' style={iconStyle} />
+                        <Icon type='Ionicons' name='md-settings' style={style.sideBarSettings} />
                     </Right>
                 </Header>
                 <Content>

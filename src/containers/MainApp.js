@@ -22,8 +22,8 @@ import ContentList from '../components/ContentList';
 import TTSPlayer from '../components/TTSPlayer';
 import TTSApi from '../services/tts_api';
 import NotificationHelper from '../services/notification_helper';
-import AppHeader from './AppHeader';
-import SideBar, { OPTION_TYPES } from './SideBar';
+import AppHeader from '../components/AppHeader';
+import SideBar, { OPTION_TYPES } from '../components/SideBar';
 
 class AppContainer extends PureComponent {
 

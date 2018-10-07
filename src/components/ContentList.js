@@ -10,6 +10,7 @@ import {
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { PLAYER_STATES } from '../constants/tts_player';
+import style from './styles/content_list';
 
 class ContentList extends PureComponent {
     renderListItem = ({ item }) => {
@@ -20,9 +21,6 @@ class ContentList extends PureComponent {
             onPause,
             onResume
         } = this.props;
-        // the margin between left and right is too close. using `flex: 0` to remove extra space
-        // at right.
-        const rightStyle = { flex: 0 };
         const playing = playerState === PLAYER_STATES.PLAYING
                         && playingItem && item.key === playingItem.key;
         const iconName = `${playing ? 'pause' : 'play'}-circle${!item.text ? '-outline' : ''}`;
@@ -46,7 +44,7 @@ class ContentList extends PureComponent {
                 <Left>
                     <Text>{item.title}</Text>
                 </Left>
-                <Right style={rightStyle}>
+                <Right style={style.itemRight}>
                     <Icon name={iconName} type='MaterialCommunityIcons' />
                 </Right>
             </ListItem>

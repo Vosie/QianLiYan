@@ -1,7 +1,9 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-    list: {
-        flex: 1
+    // the margin between left and right is too close. using `flex: 0` to remove extra space at
+    // right.
+    itemRight: {
+        flex: 0
     }
 });
