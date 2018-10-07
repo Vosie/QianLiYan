@@ -13,16 +13,12 @@ import {
 } from 'native-base';
 import { FlatList } from 'react-native';
 import _ from 'lodash';
+import { OPTION_TYPES } from '../constants/side_bar';
 import { FEED_TYPE } from '../constants/content_list';
 import i18n from '../shared/i18n';
 import style from './styles/side_bar';
-import AddRSSMenu from './AddRSSMenu';
-import AllRSSMenu from './AllRSSMenu';
-
-export const OPTION_TYPES = {
-    ADD: 'add_button',
-    ALL: 'all_items'
-};
+import AddGroupMenu from './AddGroupMenu';
+import AllGroupMenu from './AllGroupMenu';
 
 // remove this after implemented
 export const DEFAULT_FEED_LIST = [{
@@ -44,20 +40,25 @@ export const DEFAULT_FEED_LIST = [{
 }];
 class SideBar extends PureComponent {
 
+    handlePress(item) {
+        const { onPress } = this.props;
+        onPress && onPress(item);
+    }
+
     renderListItem = ({ item }) => {
         const { active, onPress } = this.props;
         switch (item.type) {
             case OPTION_TYPES.ADD:
-                return (<AddRSSMenu onPress={onPress} />);
+                return (<AddGroupMenu onPress={onPress} />);
             case OPTION_TYPES.ALL:
-                return (<AllRSSMenu active={active === OPTION_TYPES.ALL} onPress={onPress} />);
+                return (<AllGroupMenu active={active === OPTION_TYPES.ALL} onPress={onPress} />);
             default:
                 return (
                     <ListItem
                         key={item.url}
                         button
                         selected={item.url === active}
-                        onPress={onPress} >
+                        onPress={this.handlePress.bind(this, item)} >
                         <Left style={style.itemRight} />
                         <Body>
                             <Text>{item.name}</Text>
@@ -73,7 +74,7 @@ class SideBar extends PureComponent {
         }
     }
 
-    render() {
+    render = () => {
         return (
             <Container style={style.sideBar}>
                 <Header>

@@ -1,10 +1,12 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-    loading: {
-        flex: 1
-    },
     main: {
         flex: 1
+    },
+    drawer: {
+        shadowColor: '#000000',
+        shadowOpacity: 0.8,
+        shadowRadius: 3
     }
 });

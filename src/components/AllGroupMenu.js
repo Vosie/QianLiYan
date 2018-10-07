@@ -5,16 +5,23 @@ import {
     Text
 } from 'native-base';
 import i18n from '../shared/i18n';
+import { OPTION_TYPES } from '../constants/side_bar';
 import style from './styles/side_bar';
 
-class AllRSSMenu extends PureComponent {
+class AllGroupMenu extends PureComponent {
+
+    handlePress = () => {
+        const { onPress } = this.props;
+        onPress && onPress({ type: OPTION_TYPES.ALL });
+    }
+
     render() {
-        const { active, onPress } = this.props;
+        const { active } = this.props;
         return (
             <ListItem
                 button
                 selected={active}
-                onPress={onPress} >
+                onPress={this.handlePress} >
                 <Body>
                     <Text>{i18n.t('app.all_items')}</Text>
                 </Body>
@@ -23,4 +30,4 @@ class AllRSSMenu extends PureComponent {
     }
 }
 
-export default AllRSSMenu;
+export default AllGroupMenu;
