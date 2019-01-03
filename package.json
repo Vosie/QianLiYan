@@ -19,7 +19,7 @@
     "react-native-exit-app": "^1.0.0",
     "react-native-i18n": "^2.0.15",
     "react-native-modal": "^6.5.0",
-    "react-native-music-control": "^0.7.3",
+    "react-native-music-control": "^0.9.5",
     "react-native-router-flux": "^4.0.6",
     "react-native-tts": "^2.0.0",
     "react-native-xml2js": "^1.0.3",

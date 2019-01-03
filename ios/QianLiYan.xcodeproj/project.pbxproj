@@ -54,11 +54,11 @@
 		9C9C6CA592674CE2874296D2 /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7C3537687C184AA3B4AC4C3F /* rubicon-icon-font.ttf */; };
 		6998260D7E77410A82CA576D /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3190666F935C491A9BDA9051 /* SimpleLineIcons.ttf */; };
 		45189666811643838E7F9221 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 528A00EF68D54463986E72C9 /* Zocial.ttf */; };
-		752AB7DA9D984D039592BDAF /* libMusicControl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EDAAA2DE3E2E4E928D50CAFC /* libMusicControl.a */; };
-		BCF3707D6F824DAF8F88B02A /* libMusicControl-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2A6E0AD38564C1FB9E829E9 /* libMusicControl-tvOS.a */; };
 		C8930CD6475147AE8DD04D6A /* libTextToSpeech.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CCBD2486B1042ED9A19FE4A /* libTextToSpeech.a */; };
 		767EB6059135439EA2328D05 /* libRNI18n.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BD863FF94184AE5AAE01779 /* libRNI18n.a */; };
 		6EA803BCCB0049D39AF518EE /* libRNI18n-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B53743CEC7264CCABB3E39A1 /* libRNI18n-tvOS.a */; };
+		B53D52ADA0004310B62564B3 /* libMusicControl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DEA32907A0E14704BA1671D5 /* libMusicControl.a */; };
+		3431E5571633453C908762C7 /* libMusicControl-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F0A4EC55D83420D915EC2B0 /* libMusicControl-tvOS.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -384,14 +384,14 @@
 		7C3537687C184AA3B4AC4C3F /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; name = "rubicon-icon-font.ttf"; path = "../node_modules/native-base/Fonts/rubicon-icon-font.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		3190666F935C491A9BDA9051 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; name = "SimpleLineIcons.ttf"; path = "../node_modules/native-base/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		528A00EF68D54463986E72C9 /* Zocial.ttf */ = {isa = PBXFileReference; name = "Zocial.ttf"; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		39001CB047DE4C4093860BBA /* MusicControl.xcodeproj */ = {isa = PBXFileReference; name = "MusicControl.xcodeproj"; path = "../node_modules/react-native-music-control/ios/MusicControl.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		EDAAA2DE3E2E4E928D50CAFC /* libMusicControl.a */ = {isa = PBXFileReference; name = "libMusicControl.a"; path = "libMusicControl.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
-		F2A6E0AD38564C1FB9E829E9 /* libMusicControl-tvOS.a */ = {isa = PBXFileReference; name = "libMusicControl-tvOS.a"; path = "libMusicControl-tvOS.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		F85696944DEB452A8724DB1B /* TextToSpeech.xcodeproj */ = {isa = PBXFileReference; name = "TextToSpeech.xcodeproj"; path = "../node_modules/react-native-tts/ios/TextToSpeech.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		8CCBD2486B1042ED9A19FE4A /* libTextToSpeech.a */ = {isa = PBXFileReference; name = "libTextToSpeech.a"; path = "libTextToSpeech.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		0786BD0871C0443990439577 /* RNI18n.xcodeproj */ = {isa = PBXFileReference; name = "RNI18n.xcodeproj"; path = "../node_modules/react-native-i18n/ios/RNI18n.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		9BD863FF94184AE5AAE01779 /* libRNI18n.a */ = {isa = PBXFileReference; name = "libRNI18n.a"; path = "libRNI18n.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		B53743CEC7264CCABB3E39A1 /* libRNI18n-tvOS.a */ = {isa = PBXFileReference; name = "libRNI18n-tvOS.a"; path = "libRNI18n-tvOS.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		629E1AD3C1284F29956DB058 /* MusicControl.xcodeproj */ = {isa = PBXFileReference; name = "MusicControl.xcodeproj"; path = "../node_modules/react-native-music-control/ios/MusicControl.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		DEA32907A0E14704BA1671D5 /* libMusicControl.a */ = {isa = PBXFileReference; name = "libMusicControl.a"; path = "libMusicControl.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		0F0A4EC55D83420D915EC2B0 /* libMusicControl-tvOS.a */ = {isa = PBXFileReference; name = "libMusicControl-tvOS.a"; path = "libMusicControl-tvOS.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -422,9 +422,9 @@
 				30E061C122AE4EF59FD2FE61 /* libRNBackgroundTimer.a in Frameworks */,
 				D1E77F7495B0456D9EA70869 /* libDeviceLocker.a in Frameworks */,
 				1FFFDADAD678498DB7C233AC /* libRNExitApp.a in Frameworks */,
-				752AB7DA9D984D039592BDAF /* libMusicControl.a in Frameworks */,
 				C8930CD6475147AE8DD04D6A /* libTextToSpeech.a in Frameworks */,
 				767EB6059135439EA2328D05 /* libRNI18n.a in Frameworks */,
+				B53D52ADA0004310B62564B3 /* libMusicControl.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -444,6 +444,7 @@
 				4B23F91838E14452A073F9B3 /* libMusicControl-tvOS.a in Frameworks */,
 				BCF3707D6F824DAF8F88B02A /* libMusicControl-tvOS.a in Frameworks */,
 				6EA803BCCB0049D39AF518EE /* libRNI18n-tvOS.a in Frameworks */,
+				3431E5571633453C908762C7 /* libMusicControl-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -618,9 +619,9 @@
 				E1242234AC0445C4ACF13A59 /* RNBackgroundTimer.xcodeproj */,
 				0C0A840C654648EFB0E476FA /* DeviceLocker.xcodeproj */,
 				37D6E496B5FD4B408405039D /* RNExitApp.xcodeproj */,
-				39001CB047DE4C4093860BBA /* MusicControl.xcodeproj */,
 				F85696944DEB452A8724DB1B /* TextToSpeech.xcodeproj */,
 				0786BD0871C0443990439577 /* RNI18n.xcodeproj */,
+				629E1AD3C1284F29956DB058 /* MusicControl.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1292,9 +1293,9 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-background-timer/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-locker/ios",
-					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
 					"$(SRCROOT)/../node_modules/react-native-i18n/ios",
+					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 				);
 			};
 			name = Debug;
@@ -1323,9 +1324,9 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-background-timer/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-locker/ios",
-					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
 					"$(SRCROOT)/../node_modules/react-native-i18n/ios",
+					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 				);
 			};
 			name = Release;
@@ -1350,9 +1351,9 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-background-timer/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-locker/ios",
-					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
 					"$(SRCROOT)/../node_modules/react-native-i18n/ios",
+					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 				);
 			};
 			name = Debug;
@@ -1376,9 +1377,9 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-background-timer/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-locker/ios",
-					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
 					"$(SRCROOT)/../node_modules/react-native-i18n/ios",
+					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 				);
 			};
 			name = Release;
@@ -1415,9 +1416,9 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-background-timer/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-locker/ios",
-					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
 					"$(SRCROOT)/../node_modules/react-native-i18n/ios",
+					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 				);
 			};
 			name = Debug;
@@ -1454,9 +1455,9 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-background-timer/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-locker/ios",
-					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
 					"$(SRCROOT)/../node_modules/react-native-i18n/ios",
+					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 				);
 			};
 			name = Release;
@@ -1492,9 +1493,9 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-background-timer/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-locker/ios",
-					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
 					"$(SRCROOT)/../node_modules/react-native-i18n/ios",
+					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 				);
 			};
 			name = Debug;
@@ -1530,9 +1531,9 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-background-timer/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-locker/ios",
-					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
 					"$(SRCROOT)/../node_modules/react-native-i18n/ios",
+					"$(SRCROOT)/../node_modules/react-native-music-control/ios",
 				);
 			};
 			name = Release;

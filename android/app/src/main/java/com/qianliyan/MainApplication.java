@@ -3,9 +3,9 @@ package com.qianliyan;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.tanguyantoine.react.MusicControl;
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
 import net.no_mad.tts.TextToSpeechPackage;
-import com.tanguyantoine.react.MusicControl;
 import com.github.wumke.RNExitApp.RNExitAppPackage;
 import org.vosie.reactnative.devicelocker.DeviceLockerPackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
@@ -29,9 +29,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new MusicControl(),
             new RNI18nPackage(),
             new TextToSpeechPackage(),
-            new MusicControl(),
             new RNExitAppPackage(),
             new DeviceLockerPackage(),
             new BackgroundTimerPackage()

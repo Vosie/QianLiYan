@@ -47,6 +47,7 @@ class NotificationHelper {
     onNotificationClosed(fn) {
         // TODO: rewrite this as a good event handler model.
         MusicControl.on('closeNotification', () => {
+            console.log('close it....');
             fn();
         });
     }

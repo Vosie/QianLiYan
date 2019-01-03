@@ -12,6 +12,8 @@ class MusicEventSource extends EventEmitter {
     }
 
     initMusicControl() {
+        MusicControl.enableBackgroundMode(true);
+        MusicControl.handleAudioInterruptions(true);
         // basic
         MusicControl.enableControl('play', true);
         MusicControl.enableControl('pause', true);
@@ -32,6 +34,7 @@ class MusicEventSource extends EventEmitter {
         // This happens when headphones are unplugged or a bluetooth audio peripheral disconnects
         // from the device
         MusicControl.on('pause', ()=> {
+            console.log('pause clicked');
             // Have no idea to handle pause or playNextItem on a headset with single button pressed.
             // UX needed...  :'(
             if (this.timeoutID) {
